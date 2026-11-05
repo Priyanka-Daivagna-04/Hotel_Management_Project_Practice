@@ -225,7 +225,24 @@ npm test
 
 ---
 
-## 7. STEP-BY-STEP AWS DEPLOYMENT GUIDE
+## 7. PUSHING TO GITHUB
+
+This repository is already initialized on `main` with all files committed and credentials protected in `.gitignore`.
+
+To push to your GitHub account:
+1. Go to [GitHub New Repository](https://github.com/new).
+2. Enter Repository name: `hotel-management` (or your preferred name).
+3. Leave "Initialize this repository with README" **unchecked** (we already have everything committed).
+4. Click **Create repository**.
+5. In your project terminal, run:
+```bash
+git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPOSITORY_NAME>.git
+git push -u origin main
+```
+
+---
+
+## 8. STEP-BY-STEP AWS DEPLOYMENT GUIDE
 
 ### Step A: Setup MongoDB Atlas Cluster
 1. Log in to [MongoDB Atlas](https://cloud.mongodb.com/).
