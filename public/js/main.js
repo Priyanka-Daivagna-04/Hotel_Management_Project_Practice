@@ -1,21 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Sidebar Toggle
+  // 1. Sidebar Toggle (Both Full-Screen Desktop & Mobile)
   const sidebar = document.getElementById('appSidebar');
   const sidebarToggle = document.getElementById('sidebarToggle');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const appWrapper = document.querySelector('.app-wrapper');
 
-  if (sidebarToggle && sidebar) {
-    sidebarToggle.addEventListener('click', () => {
-      sidebar.classList.toggle('show');
-      if (sidebarOverlay) {
-        sidebarOverlay.classList.toggle('show');
+  // Restore saved desktop sidebar preference
+  try {
+    if (window.innerWidth >= 992 && localStorage.getItem('grand_royale_sidebar_collapsed') === 'true') {
+      document.body.classList.add('sidebar-collapsed');
+      if (appWrapper) appWrapper.classList.add('sidebar-collapsed');
+    }
+  } catch (err) {}
+
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isMobile = window.innerWidth < 992;
+
+      if (isMobile) {
+        // Mobile / Small Screen drawer toggle
+        if (sidebar) sidebar.classList.toggle('show');
+        if (sidebarOverlay) sidebarOverlay.classList.toggle('show');
+      } else {
+        // Desktop / Full-Screen: Smoothly hide and show the entire side menu bar!
+        document.body.classList.toggle('sidebar-collapsed');
+        if (appWrapper) appWrapper.classList.toggle('sidebar-collapsed');
+
+        const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+        try {
+          localStorage.setItem('grand_royale_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        } catch (err) {}
+
+        // Trigger resize event so Chart.js graphs adapt smoothly to full screen width
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 260);
       }
     });
   }
 
   if (sidebarOverlay) {
     sidebarOverlay.addEventListener('click', () => {
-      sidebar.classList.remove('show');
+      if (sidebar) sidebar.classList.remove('show');
       sidebarOverlay.classList.remove('show');
     });
   }

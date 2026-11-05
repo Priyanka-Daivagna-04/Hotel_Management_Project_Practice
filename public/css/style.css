@@ -69,8 +69,42 @@ h1, h2, h3, h4, .brand-title {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  transition: all var(--transition-speed) ease-in-out;
+  transition: transform var(--transition-speed) ease-in-out, box-shadow var(--transition-speed) ease-in-out;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease-in-out;
+}
+
+.sidebar-overlay.show {
+  display: block;
+  opacity: 1;
+}
+
+/* Full Screen / Desktop Toggle: Hide and Show Side Menu Bar */
+body.sidebar-collapsed .sidebar,
+.app-wrapper.sidebar-collapsed .sidebar {
+  transform: translateX(-100%);
+  box-shadow: none;
+}
+
+body.sidebar-collapsed .main-wrapper,
+.app-wrapper.sidebar-collapsed .main-wrapper {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .sidebar-brand {
@@ -252,21 +286,24 @@ h1, h2, h3, h4, .brand-title {
 }
 
 .btn-sidebar-toggle {
-  background: none;
-  border: none;
+  background: #f8fafc;
+  border: 1px solid var(--hotel-border);
   font-size: 1.25rem;
-  color: var(--hotel-text-muted);
+  color: var(--hotel-text-main);
   cursor: pointer;
-  padding: 0.4rem;
+  padding: 0.35rem 0.65rem;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .btn-sidebar-toggle:hover {
-  background-color: var(--hotel-bg);
-  color: var(--hotel-text-main);
+  background-color: var(--hotel-gold-light);
+  border-color: var(--hotel-gold);
+  color: var(--hotel-gold-hover);
+  transform: scale(1.05);
 }
 
 .header-title-badge {
