@@ -1,0 +1,158 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Reservations & Bookings</h1>
+    <p class="text-muted small mb-0">Manage guest stays, reservation timelines, check-ins, and departures.</p>
+  </div>
+  <a href="/bookings/new" class="btn btn-gold">
+    <i class="bi bi-calendar-plus me-1"></i> New Reservation
+  </a>
+</div>
+
+<!-- Filters Toolbar -->
+<div class="luxury-card p-3 mb-4">
+  <form action="/bookings" method="GET" class="row g-2 align-items-center">
+    <div class="col-12 col-md-3">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Booking #, guest name, phone..." value="<%= searchQuery %>">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+        <option value="Confirmed" <%= selectedStatus === 'Confirmed' ? 'selected' : '' %>>Confirmed</option>
+        <option value="Checked In" <%= selectedStatus === 'Checked In' ? 'selected' : '' %>>Checked In</option>
+        <option value="Checked Out" <%= selectedStatus === 'Checked Out' ? 'selected' : '' %>>Checked Out</option>
+        <option value="Cancelled" <%= selectedStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+      <input type="date" name="startDate" class="form-control" placeholder="From" value="<%= startDate %>">
+    </div>
+
+    <div class="col-6 col-md-2">
+      <input type="date" name="endDate" class="form-control" placeholder="To" value="<%= endDate %>">
+    </div>
+
+    <div class="col-6 col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-navy flex-grow-1">Filter</button>
+      <% if (searchQuery || selectedStatus !== 'all' || startDate || endDate) { %>
+        <a href="/bookings" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Bookings Table -->
+<div class="luxury-card overflow-hidden">
+  <% if (bookings && bookings.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Booking #</th>
+            <th>Guest Details</th>
+            <th>Room</th>
+            <th>Stay Period</th>
+            <th>Status</th>
+            <th>Financials</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% bookings.forEach(booking => { %>
+            <tr>
+              <td>
+                <a href="/bookings/<%= booking._id %>" class="fw-bold text-dark text-decoration-none">
+                  <%= booking.bookingNumber %>
+                </a>
+                <div class="text-muted" style="font-size: 0.75rem;">
+                  <%= new Date(booking.createdAt).toLocaleDateString() %>
+                </div>
+              </td>
+              <td>
+                <% if (booking.guest) { %>
+                  <div class="fw-semibold text-dark"><%= booking.guest.firstName %> <%= booking.guest.lastName %></div>
+                  <small class="text-muted"><%= booking.guest.phone %></small>
+                <% } else { %>
+                  <span class="text-muted">Unregistered</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (booking.room) { %>
+                  <span class="badge bg-light text-dark border">
+                    Room <%= booking.room.roomNumber %>
+                  </span>
+                  <div class="text-muted" style="font-size: 0.75rem;"><%= booking.room.category ? booking.room.category.name : '' %></div>
+                <% } else { %>
+                  <span class="badge bg-warning-subtle text-warning">Unassigned</span>
+                <% } %>
+              </td>
+              <td>
+                <div class="small fw-semibold text-dark">
+                  <%= formatDateIN(booking.checkInDate) %> &rarr; <%= formatDateIN(booking.checkOutDate) %>
+                </div>
+                <small class="text-muted"><%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %> • <%= booking.adults %> Adult<%= booking.adults > 1 ? 's' : '' %></small>
+              </td>
+              <td>
+                <span class="badge-status <%= booking.status.replace(/\s+/g, '_') %>"><%= booking.status %></span>
+              </td>
+              <td>
+                <div class="fw-bold text-dark"><%= formatINR(booking.totalPrice) %></div>
+                <% if (booking.balanceAmount > 0) { %>
+                  <small class="text-danger">Due: <%= formatINR(booking.balanceAmount) %></small>
+                <% } else { %>
+                  <small class="text-success"><i class="bi bi-check-circle"></i> Paid in Full</small>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-light border" title="View Voucher">
+                    <i class="bi bi-eye"></i>
+                  </a>
+
+                  <!-- Receptionist Quick Check-In / Check-Out Actions -->
+                  <% if (booking.status === 'Confirmed') { %>
+                    <form action="/bookings/<%= booking._id %>/checkin" method="POST" class="d-inline">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="btn btn-sm btn-outline-success" title="Check In Guest">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                      </button>
+                    </form>
+                  <% } else if (booking.status === 'Checked In') { %>
+                    <form action="/bookings/<%= booking._id %>/checkout" method="POST" class="d-inline">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <button type="submit" class="btn btn-sm btn-outline-primary" title="Check Out Guest">
+                        <i class="bi bi-box-arrow-right"></i>
+                      </button>
+                    </form>
+                  <% } %>
+
+                  <a href="/bookings/<%= booking._id %>/edit" class="btn btn-sm btn-light border" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-3 border-top">
+      <%- include('../partials/pagination') %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
+      <h4 class="text-dark fw-bold">No reservations found</h4>
+      <p class="small mb-3">No bookings currently match your criteria.</p>
+      <a href="/bookings/new" class="btn btn-gold"><i class="bi bi-calendar-plus me-1"></i> Make a Reservation</a>
+    </div>
+  <% } %>
+</div>
+

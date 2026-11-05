@@ -1,0 +1,747 @@
+/* ========================================================
+   GRAND ROYALE HOTEL MANAGEMENT SYSTEM - LUXURY STYLESHEET
+   Palette: Deep Navy (#0f172a), Muted Gold (#c5a059 / #d4af37),
+            Clean Slate (#f8fafc), White (#ffffff)
+   ======================================================== */
+
+:root {
+  --hotel-navy-dark: #090e1a;
+  --hotel-navy: #0f172a;
+  --hotel-navy-light: #1e293b;
+  --hotel-gold: #c5a059;
+  --hotel-gold-hover: #b38d42;
+  --hotel-gold-light: #fef9ee;
+  --hotel-bg: #f8fafc;
+  --hotel-card-bg: #ffffff;
+  --hotel-text-main: #1e293b;
+  --hotel-text-muted: #64748b;
+  --hotel-border: #e2e8f0;
+  --hotel-border-light: #f1f5f9;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 78px;
+  --header-height: 70px;
+  --transition-speed: 0.25s;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--hotel-bg);
+  color: var(--hotel-text-main);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .brand-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* ----------------------------------------------------
+   SIDEBAR
+   ---------------------------------------------------- */
+.app-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  background: linear-gradient(180deg, var(--hotel-navy-dark) 0%, var(--hotel-navy) 100%);
+  color: #fff;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-speed) ease-in-out;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-brand {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #fff;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--hotel-gold) 0%, #ecd08c 100%);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hotel-navy-dark);
+  font-size: 1.25rem;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.3);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.brand-subtitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--hotel-gold);
+  font-weight: 600;
+}
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0.75rem;
+}
+
+.nav-section-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  padding: 0.75rem 0.75rem 0.25rem;
+  font-weight: 700;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  margin-bottom: 0.2rem;
+}
+
+.sidebar-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-link.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(197, 160, 89, 0.25) 0%, rgba(197, 160, 89, 0.05) 100%);
+  border-left: 3px solid var(--hotel-gold);
+  font-weight: 600;
+}
+
+.sidebar-link i {
+  font-size: 1.15rem;
+  width: 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.sidebar-link.active i {
+  color: var(--hotel-gold);
+}
+
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.user-snippet {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-snippet img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--hotel-gold);
+}
+
+.user-snippet-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-snippet-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-snippet-role {
+  font-size: 0.7rem;
+  color: var(--hotel-gold);
+  font-weight: 500;
+}
+
+/* ----------------------------------------------------
+   MAIN CONTENT & HEADER
+   ---------------------------------------------------- */
+.main-wrapper {
+  flex: 1 1 auto;
+  width: calc(100% - var(--sidebar-width));
+  max-width: calc(100% - var(--sidebar-width));
+  margin-left: var(--sidebar-width);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: all var(--transition-speed) ease-in-out;
+  background-color: var(--hotel-bg);
+}
+
+.top-header {
+  height: var(--header-height);
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid var(--hotel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.btn-sidebar-toggle {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--hotel-text-muted);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-sidebar-toggle:hover {
+  background-color: var(--hotel-bg);
+  color: var(--hotel-text-main);
+}
+
+.header-title-badge {
+  font-size: 0.82rem;
+  background-color: var(--hotel-gold-light);
+  color: var(--hotel-gold-hover);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.header-time {
+  font-size: 0.85rem;
+  color: var(--hotel-text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+  display: none;
+}
+@media (min-width: 768px) {
+  .header-time { display: block; }
+}
+
+/* ----------------------------------------------------
+   PAGE CONTAINER & CARDS
+   ---------------------------------------------------- */
+.page-body {
+  flex: 1;
+  padding: 1.75rem 2rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.booking-room-select-card {
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--hotel-border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.booking-room-select-card:hover {
+  border-color: var(--hotel-gold);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.booking-room-select-card.border-primary,
+.booking-room-select-card:has(input[type="radio"]:checked) {
+  border-color: var(--hotel-gold) !important;
+  background: var(--hotel-gold-light) !important;
+  box-shadow: 0 0 0 1px var(--hotel-gold);
+}
+
+.luxury-card {
+  background: var(--hotel-card-bg);
+  border: 1px solid var(--hotel-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-speed) ease;
+}
+
+.luxury-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card {
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  background: #fff;
+  border: 1px solid var(--hotel-border);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-icon.gold {
+  background: rgba(197, 160, 89, 0.15);
+  color: var(--hotel-gold-hover);
+}
+
+.stat-icon.blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.stat-icon.green {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.stat-icon.red {
+  background: #fff1f2;
+  color: #e11d48;
+}
+
+.stat-icon.purple {
+  background: #faf5ff;
+  color: #9333ea;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--hotel-text-muted);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--hotel-text-main);
+  line-height: 1.1;
+}
+
+/* ----------------------------------------------------
+   STATUS BADGES
+   ---------------------------------------------------- */
+.badge-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-status.Available {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-status.Occupied {
+  background-color: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-status.Reserved {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-status.Maintenance {
+  background-color: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+}
+
+.badge-status.Paid {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-status.Partially_Paid,
+.badge-status.Partially\ Paid {
+  background-color: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-status.Pending {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.badge-status.Refunded {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-status.Confirmed {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.badge-status.Checked_In,
+.badge-status.Checked\ In {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.badge-status.Checked_Out,
+.badge-status.Checked\ Out {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.badge-status.Cancelled {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ----------------------------------------------------
+   BUTTONS & FORMS
+   ---------------------------------------------------- */
+.btn-gold {
+  background: linear-gradient(135deg, var(--hotel-gold) 0%, #b38d42 100%);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 1.25rem;
+  box-shadow: 0 2px 4px rgba(197, 160, 89, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover, .btn-gold:focus {
+  background: linear-gradient(135deg, #b38d42 0%, #9c7832 100%);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(197, 160, 89, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-outline-gold {
+  background: transparent;
+  color: var(--hotel-gold-hover);
+  border: 1px solid var(--hotel-gold);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1.15rem;
+  transition: all 0.2s ease;
+}
+
+.btn-outline-gold:hover {
+  background: var(--hotel-gold);
+  color: #fff;
+}
+
+.btn-navy {
+  background: var(--hotel-navy);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-navy:hover {
+  background: var(--hotel-navy-dark);
+  color: #fff;
+}
+
+.form-control, .form-select {
+  border-radius: var(--radius-sm);
+  border-color: var(--hotel-border);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--hotel-gold);
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.18);
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--hotel-text-main);
+  margin-bottom: 0.35rem;
+}
+
+/* ----------------------------------------------------
+   TABLES & LISTS
+   ---------------------------------------------------- */
+.table-luxury {
+  width: 100%;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.table-luxury th {
+  background-color: #f8fafc;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--hotel-text-muted);
+  font-weight: 700;
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--hotel-border);
+}
+
+.table-luxury td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--hotel-border-light);
+  font-size: 0.9rem;
+}
+
+.table-luxury tr:hover td {
+  background-color: #fbfcfe;
+}
+
+/* ----------------------------------------------------
+   ROOM CARDS GRID
+   ---------------------------------------------------- */
+.room-card {
+  border: 1px solid var(--hotel-border);
+  border-radius: var(--radius-md);
+  background: #fff;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.room-card-img-wrapper {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+.room-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.room-card:hover .room-card-img {
+  transform: scale(1.05);
+}
+
+.room-badge-overlay {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.room-price-overlay {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.room-price-overlay span {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #cbd5e1;
+}
+
+/* ----------------------------------------------------
+   INVOICE STYLING
+   ---------------------------------------------------- */
+.invoice-box {
+  background: #fff;
+  border: 1px solid var(--hotel-border);
+  border-radius: var(--radius-md);
+  padding: 2.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-md);
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .sidebar, .top-header, .no-print, .btn, footer {
+    display: none !important;
+  }
+  .main-wrapper {
+    margin-left: 0 !important;
+  }
+  .page-body {
+    padding: 0 !important;
+  }
+  .invoice-box {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ----------------------------------------------------
+   AUTH / LOGIN PAGE
+   ---------------------------------------------------- */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--hotel-navy-dark) 0%, #1e293b 100%);
+  padding: 1.5rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE TOGGLE
+   ---------------------------------------------------- */
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  .page-body {
+    padding: 1.25rem 1rem;
+  }
+  .top-header {
+    padding: 0 1rem;
+  }
+}

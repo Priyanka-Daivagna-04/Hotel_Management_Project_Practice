@@ -1,0 +1,137 @@
+<!-- Invoice Navigation Bar -->
+<div class="d-flex justify-content-between align-items-center mb-4 no-print" style="max-width: 800px; margin: 0 auto;">
+  <a href="/payments" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Payments
+  </a>
+  <div class="d-flex gap-2">
+    <button onclick="window.print()" class="btn btn-gold">
+      <i class="bi bi-printer me-1"></i> Print Invoice
+    </button>
+  </div>
+</div>
+
+<!-- Invoice Folio Box -->
+<div class="invoice-box">
+  <!-- Invoice Header -->
+  <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <i class="bi bi-gem fs-2 text-warning"></i>
+        <h2 class="brand-title text-dark mb-0">Grand Royale</h2>
+      </div>
+      <p class="text-muted small mb-1">Luxury Hotel & Resort</p>
+      <div class="text-muted" style="font-size: 0.75rem;">
+        Royale Marine Drive, Nariman Point, Mumbai, Maharashtra 400021<br>
+        Phone: +91 (022) 2288-9000 • Email: billing@grandroyale.com • GSTIN: 27AABCG1234F1Z5
+      </div>
+    </div>
+    <div class="text-end">
+      <div class="fs-4 fw-bold text-dark mb-1">TAX INVOICE / FOLIO</div>
+      <div class="small fw-semibold text-muted">Invoice #: <span class="text-dark font-monospace"><%= payment.invoiceNumber %></span></div>
+      <div class="small text-muted">Issue Date: <%= formatDateIN(payment.createdAt) %></div>
+      <div class="mt-2">
+        <span class="badge-status <%= payment.status %>"><%= payment.status %></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bill To & Stay Summary -->
+  <div class="row g-4 mb-4">
+    <div class="col-6">
+      <h6 class="text-uppercase text-muted fw-bold small mb-2">Billed To:</h6>
+      <% if (guest) { %>
+        <h5 class="fw-bold text-dark mb-1"><%= guest.firstName %> <%= guest.lastName %></h5>
+        <div class="small text-muted mb-1"><%= guest.email %></div>
+        <div class="small text-muted mb-1"><%= guest.phone %></div>
+        <div class="small text-muted">
+          <%= [guest.address?.street, guest.address?.city, guest.address?.state, guest.address?.country].filter(Boolean).join(', ') %>
+        </div>
+      <% } else { %>
+        <p class="text-muted small">Walk-in / Direct Client</p>
+      <% } %>
+    </div>
+
+    <div class="col-6 text-end">
+      <h6 class="text-uppercase text-muted fw-bold small mb-2">Reservation Info:</h6>
+      <% if (booking) { %>
+        <div class="fw-bold text-dark">Booking Ref: <%= booking.bookingNumber %></div>
+        <div class="small text-muted">Room: <%= booking.room ? booking.room.roomNumber + ' (' + (booking.room.category ? booking.room.category.name : 'Deluxe') + ')' : 'N/A' %></div>
+        <div class="small text-muted">Stay: <%= formatDateIN(booking.checkInDate) %> &rarr; <%= formatDateIN(booking.checkOutDate) %> (<%= booking.nights %> nights)</div>
+        <div class="small text-muted">Occupancy: <%= booking.adults %> Adult(s), <%= booking.children %> Child(ren)</div>
+      <% } else { %>
+        <div class="small text-muted">Direct Hospitality Service</div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Itemized Invoice Table -->
+  <div class="table-responsive mb-4">
+    <table class="table table-bordered border-light-subtle">
+      <thead class="bg-light">
+        <tr>
+          <th>Description</th>
+          <th class="text-center">Rate</th>
+          <th class="text-center">Qty / Nights</th>
+          <th class="text-end">Amount (INR)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (booking) { %>
+          <tr>
+            <td>
+              <strong class="text-dark">Room Stay Charge</strong>
+              <div class="text-muted small">Room <%= booking.room ? booking.room.roomNumber : '' %> Accommodations</div>
+            </td>
+            <td class="text-center"><%= formatINR(booking.pricePerNight) %></td>
+            <td class="text-center"><%= booking.nights %></td>
+            <td class="text-end fw-semibold text-dark"><%= formatINR(booking.totalPrice) %></td>
+          </tr>
+        <% } %>
+        <tr>
+          <td>
+            <strong class="text-dark">Payment Settled: <%= payment.paymentMethod %></strong>
+            <div class="text-muted small">Reference: <%= payment.transactionId || 'Direct Settlement' %></div>
+          </td>
+          <td class="text-center">—</td>
+          <td class="text-center">1</td>
+          <td class="text-end fw-bold text-success">-<%= formatINR(payment.amount) %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Financial Settlement Summary -->
+  <div class="row justify-content-end mb-4">
+    <div class="col-6">
+      <div class="p-3 bg-light rounded">
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted small">Payment Method:</span>
+          <span class="fw-semibold text-dark small"><%= payment.paymentMethod %></span>
+        </div>
+        <div class="d-flex justify-content-between mb-2">
+          <span class="text-muted small">Transaction Ref:</span>
+          <span class="font-monospace text-dark small"><%= payment.transactionId || 'N/A' %></span>
+        </div>
+        <div class="d-flex justify-content-between mb-2 border-top pt-2">
+          <span class="fw-bold text-dark">This Receipt Paid:</span>
+          <span class="fw-bold text-success fs-5"><%= formatINR(payment.amount) %></span>
+        </div>
+        <% if (booking) { %>
+          <div class="d-flex justify-content-between border-top pt-2">
+            <span class="small text-muted">Remaining Balance:</span>
+            <span class="small fw-bold <%= booking.balanceAmount > 0 ? 'text-danger' : 'text-success' %>">
+              <%= formatINR(booking.balanceAmount) %>
+            </span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Remarks -->
+  <div class="border-top pt-4 text-center text-muted small">
+    <p class="mb-1">Thank you for staying at <strong>Grand Royale Hotel & Resorts</strong>.</p>
+    <p class="mb-0" style="font-size: 0.75rem;">This is a computer-generated tax invoice and requires no physical signature.</p>
+  </div>
+</div>
+

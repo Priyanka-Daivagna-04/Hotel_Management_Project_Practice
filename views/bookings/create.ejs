@@ -1,0 +1,335 @@
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Create Reservation</h1>
+    <p class="text-muted small mb-0">Search real-time room availability, assign registered or new guests, and secure reservations.</p>
+  </div>
+  <a href="/bookings" class="btn btn-outline-secondary flex-shrink-0">
+    <i class="bi bi-arrow-left me-1"></i> Back to Reservations
+  </a>
+</div>
+
+<!-- Step 1: Search & Check Real-time Availability -->
+<div class="luxury-card p-4 mb-4">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="bg-warning-subtle text-warning p-2 rounded">
+      <i class="bi bi-search fs-5"></i>
+    </div>
+    <div>
+      <h5 class="fw-bold text-dark mb-0">1. Check Real-Time Availability</h5>
+      <small class="text-muted">Select dates and party size to discover ready-for-occupancy rooms</small>
+    </div>
+  </div>
+
+  <form action="/bookings/new" method="GET" class="row g-3 align-items-end">
+    <div class="col-12 col-sm-6 col-lg-3">
+      <label for="checkInDate" class="form-label small fw-semibold">Check-in Date <span class="text-danger">*</span></label>
+      <input type="date" class="form-control" id="checkInDate" name="checkInDate" value="<%= query.checkInDate || new Date().toISOString().slice(0, 10) %>" required>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3">
+      <label for="checkOutDate" class="form-label small fw-semibold">Check-out Date <span class="text-danger">*</span></label>
+      <% 
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const defaultOut = tomorrow.toISOString().slice(0, 10);
+      %>
+      <input type="date" class="form-control" id="checkOutDate" name="checkOutDate" value="<%= query.checkOutDate || defaultOut %>" required>
+    </div>
+
+    <div class="col-6 col-sm-3 col-lg-2">
+      <label for="adults" class="form-label small fw-semibold">Adults</label>
+      <input type="number" class="form-control" id="adults" name="adults" value="<%= query.adults || 1 %>" min="1" max="10">
+    </div>
+
+    <div class="col-6 col-sm-3 col-lg-2">
+      <label for="children" class="form-label small fw-semibold">Children</label>
+      <input type="number" class="form-control" id="children" name="children" value="<%= query.children || 0 %>" min="0" max="6">
+    </div>
+
+    <div class="col-12 col-lg-2">
+      <button type="submit" class="btn btn-navy w-100 py-2">
+        <i class="bi bi-calendar2-check me-1"></i> Search
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Step 2 & 3: Booking Form -->
+<form action="/bookings" method="POST">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <!-- Retain selected dates -->
+  <input type="hidden" name="checkInDate" value="<%= query.checkInDate || new Date().toISOString().slice(0, 10) %>">
+  <input type="hidden" name="checkOutDate" value="<%= query.checkOutDate || defaultOut %>">
+  <input type="hidden" name="adults" value="<%= query.adults || 1 %>">
+  <input type="hidden" name="children" value="<%= query.children || 0 %>">
+
+  <div class="row g-4">
+    <!-- Available Rooms Selection Column -->
+    <div class="col-12 col-xl-7">
+      <div class="luxury-card p-4 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-primary-subtle text-primary p-2 rounded">
+              <i class="bi bi-door-open fs-5"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold text-dark mb-0">2. Select Available Room</h5>
+              <small class="text-muted">Choose from rooms vacant for your selected dates</small>
+            </div>
+          </div>
+          <% if (searched && availableRooms) { %>
+            <span class="badge bg-light text-dark border"><%= availableRooms.length %> Room<%= availableRooms.length !== 1 ? 's' : '' %> Available</span>
+          <% } %>
+        </div>
+
+        <% if (searched && availableRooms && availableRooms.length > 0) { %>
+          <div class="vstack gap-3">
+            <% availableRooms.forEach((room, idx) => { %>
+              <label class="booking-room-select-card card border p-3 cursor-pointer <%= idx === 0 ? 'border-primary' : '' %>" style="transition: all 0.2s;">
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="radio" name="roomId" value="<%= room._id %>" class="form-check-input mt-0 fs-5 flex-shrink-0" <%= idx === 0 ? 'checked' : '' %> required>
+                    <img src="<%= room.primaryImage %>" alt="Room <%= room.roomNumber %>" class="rounded object-fit-cover flex-shrink-0" width="110" height="80">
+                  </div>
+                  
+                  <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-dark text-white px-2 py-1">Room <%= room.roomNumber %></span>
+                        <span class="fw-bold text-dark"><%= room.category ? room.category.name : 'Standard' %></span>
+                      </div>
+                      <span class="badge bg-gold-subtle text-dark fw-bold fs-6 px-2 py-1 border border-warning">
+                        <%= formatINR(room.pricePerNight) %> / night
+                      </span>
+                    </div>
+
+                    <div class="small text-muted mb-2">
+                      <i class="bi bi-building me-1"></i>Floor <%= room.floor %>
+                      <span class="mx-1">•</span>
+                      <i class="bi bi-people me-1"></i>Up to <%= room.capacity %> Guests
+                    </div>
+
+                    <% if (room.amenities && room.amenities.length > 0) { %>
+                      <div class="d-flex flex-wrap gap-1">
+                        <% room.amenities.slice(0, 4).forEach(amenity => { %>
+                          <span class="badge bg-light text-secondary border small py-1" style="font-size: 0.72rem;"><%= amenity %></span>
+                        <% }); %>
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+              </label>
+            <% }); %>
+          </div>
+        <% } else if (searched) { %>
+          <div class="alert alert-warning mb-0 p-4 text-center">
+            <i class="bi bi-exclamation-triangle fs-2 d-block mb-2 text-warning"></i>
+            <h6 class="fw-bold">No Rooms Available for These Dates</h6>
+            <p class="small text-muted mb-0">All rooms in that category/date range are currently booked or undergoing maintenance. Please adjust your check-in/check-out dates or guest count.</p>
+          </div>
+        <% } else { %>
+          <div class="p-4 text-center text-muted bg-light rounded">
+            <i class="bi bi-calendar2-range fs-1 text-secondary d-block mb-2"></i>
+            <h6 class="fw-bold text-dark">Ready to Check Availability</h6>
+            <p class="small mb-0">Use the date filter above and click <strong>Search</strong> to load ready rooms.</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Guest Information & Payment Column -->
+    <div class="col-12 col-xl-5">
+      <div class="luxury-card p-4 mb-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-success-subtle text-success p-2 rounded">
+            <i class="bi bi-person fs-5"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">3. Guest Details</h5>
+            <small class="text-muted">Link an existing customer or register a new one</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Guest Assignment</label>
+          <div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="guestType" id="guestExisting" value="existing" <%= (query && query.newGuest) ? '' : 'checked' %> onchange="toggleGuestFields()">
+            <label class="btn btn-outline-secondary py-2 small fw-semibold" for="guestExisting">
+              <i class="bi bi-people me-1"></i> Existing Guest
+            </label>
+
+            <input type="radio" class="btn-check" name="guestType" id="guestNew" value="new" <%= (query && query.newGuest) ? 'checked' : '' %> onchange="toggleGuestFields()">
+            <label class="btn btn-outline-secondary py-2 small fw-semibold" for="guestNew">
+              <i class="bi bi-person-plus me-1"></i> New Guest Registration
+            </label>
+          </div>
+        </div>
+
+        <!-- Existing Guest Selector -->
+        <div id="existingGuestContainer" class="mb-3">
+          <label for="guestId" class="form-label small fw-semibold">Select Registered Guest <span class="text-danger">*</span></label>
+          <select class="form-select" id="guestId" name="guestId">
+            <% if (guests && guests.length > 0) { %>
+              <% guests.forEach(g => { %>
+                <option value="<%= g._id %>" <%= query && query.guestId && query.guestId.toString() === g._id.toString() ? 'selected' : '' %>>
+                  <%= g.firstName %> <%= g.lastName %> (<%= g.phone %> • <%= g.idType || 'ID' %>)
+                </option>
+              <% }); %>
+            <% } else { %>
+              <option value="">No guests registered yet</option>
+            <% } %>
+          </select>
+          <div class="d-flex justify-content-between mt-1">
+            <small class="text-muted">Choose guest from current hotel registry</small>
+            <a href="/guests" class="small text-decoration-none" target="_blank"><i class="bi bi-box-arrow-up-right me-1"></i>Guest Directory</a>
+          </div>
+        </div>
+
+        <!-- New Guest Real Hotel Registration Form -->
+        <div id="newGuestContainer" style="display: none;" class="border p-3 rounded mb-3 bg-light">
+          <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+            <h6 class="fw-bold text-dark small mb-0"><i class="bi bi-person-badge me-1 text-primary"></i>New Guest Registration</h6>
+            <span class="badge bg-success-subtle text-success small">Saves to Guest Directory</span>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">First Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="newGuestFirstName" name="newGuestFirstName" placeholder="e.g. Aarav">
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">Last Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" id="newGuestLastName" name="newGuestLastName" placeholder="e.g. Sharma">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">Mobile Number <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control form-control-sm" id="newGuestPhone" name="newGuestPhone" placeholder="+91 98210 54321">
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">Email Address <span class="text-danger">*</span></label>
+              <input type="email" class="form-control form-control-sm" id="newGuestEmail" name="newGuestEmail" placeholder="aarav.sharma@example.in">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">ID Document Type</label>
+              <select class="form-select form-select-sm" name="newGuestIdType">
+                <option value="Aadhaar Card" selected>Aadhaar Card</option>
+                <option value="PAN Card">PAN Card</option>
+                <option value="Driving License">Driving License</option>
+                <option value="Voter ID">Voter ID</option>
+                <option value="Passport">Passport</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">ID / Document Number</label>
+              <input type="text" class="form-control form-control-sm font-monospace" name="newGuestIdNumber" placeholder="4589 1234 5678">
+            </div>
+          </div>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <label class="form-label small mb-1">City</label>
+              <input type="text" class="form-control form-control-sm" name="newGuestCity" placeholder="e.g. Mumbai">
+            </div>
+            <div class="col-6">
+              <label class="form-label small mb-1">State</label>
+              <input type="text" class="form-control form-control-sm" name="newGuestState" placeholder="e.g. Maharashtra">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="specialRequests" class="form-label small fw-semibold">Special Requests / Notes</label>
+          <textarea class="form-control" id="specialRequests" name="specialRequests" rows="2" placeholder="e.g. Quiet floor, extra pillows, airport pickup..."></textarea>
+        </div>
+
+        <!-- Payment Deposit Section -->
+        <div class="d-flex align-items-center gap-2 mb-3 pt-3 border-top">
+          <div class="bg-warning-subtle text-warning p-2 rounded">
+            <i class="bi bi-credit-card fs-5"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold text-dark mb-0">4. Payment Deposit</h5>
+            <small class="text-muted">Record initial advance payment if collected now</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="initialPaymentAmount" class="form-label small fw-semibold">Advance Deposit Amount (₹)</label>
+          <div class="input-group">
+            <span class="input-group-text">₹</span>
+            <input type="number" step="1" class="form-control" id="initialPaymentAmount" name="initialPaymentAmount" value="0.00">
+          </div>
+          <small class="text-muted">Enter 0 to mark booking as payment pending.</small>
+        </div>
+
+        <div class="mb-4">
+          <label for="paymentMethod" class="form-label small fw-semibold">Payment Method</label>
+          <select class="form-select" id="paymentMethod" name="paymentMethod">
+            <option value="UPI / Google Pay / PhonePe" selected>UPI / Google Pay / PhonePe</option>
+            <option value="Net Banking">Net Banking</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+            <option value="Cash">Cash</option>
+            <option value="NEFT / RTGS">NEFT / RTGS</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-gold w-100 py-3 fs-6 fw-bold shadow-sm">
+          <i class="bi bi-check2-circle me-1"></i> Confirm & Book Reservation
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  function toggleGuestFields() {
+    const isNew = document.getElementById('guestNew').checked;
+    const existingContainer = document.getElementById('existingGuestContainer');
+    const newContainer = document.getElementById('newGuestContainer');
+    const guestIdSelect = document.getElementById('guestId');
+    const fNameInput = document.getElementById('newGuestFirstName');
+    const lNameInput = document.getElementById('newGuestLastName');
+    const phoneInput = document.getElementById('newGuestPhone');
+    const emailInput = document.getElementById('newGuestEmail');
+
+    if (isNew) {
+      if (existingContainer) existingContainer.style.display = 'none';
+      if (newContainer) newContainer.style.display = 'block';
+      if (guestIdSelect) guestIdSelect.disabled = true;
+
+      if (fNameInput) fNameInput.required = true;
+      if (phoneInput) phoneInput.required = true;
+      if (emailInput) emailInput.required = true;
+    } else {
+      if (existingContainer) existingContainer.style.display = 'block';
+      if (newContainer) newContainer.style.display = 'none';
+      if (guestIdSelect) guestIdSelect.disabled = false;
+
+      if (fNameInput) fNameInput.required = false;
+      if (phoneInput) phoneInput.required = false;
+      if (emailInput) emailInput.required = false;
+    }
+  }
+
+  // Visual card selection toggle for room radio
+  document.querySelectorAll('input[name="roomId"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.booking-room-select-card').forEach(c => c.classList.remove('border-primary', 'bg-light'));
+      const parentCard = radio.closest('.booking-room-select-card');
+      if (parentCard) parentCard.classList.add('border-primary', 'bg-light');
+    });
+  });
+
+  // Initialize correct state on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    toggleGuestFields();
+  });
+</script>

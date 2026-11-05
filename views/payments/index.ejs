@@ -1,0 +1,157 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Billing & Payments</h1>
+    <p class="text-muted small mb-0">Track hotel revenues, process payments, inspect invoices and handle refunds.</p>
+  </div>
+  <a href="/payments/new" class="btn btn-gold">
+    <i class="bi bi-credit-card me-1"></i> Record Payment
+  </a>
+</div>
+
+<!-- Financial Summary Quick Metric -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-4">
+    <div class="stat-card">
+      <div>
+        <div class="stat-label">Total Revenue Collected</div>
+        <div class="stat-value text-success"><%= formatINR(totalCollected) %></div>
+        <small class="text-muted"><%= totalPayments %> total payments recorded</small>
+      </div>
+      <div class="stat-icon gold">
+        <i class="bi bi-currency-rupee"></i>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Toolbar -->
+<div class="luxury-card p-3 mb-4">
+  <form action="/payments" method="GET" class="row g-2 align-items-center">
+    <div class="col-12 col-md-4">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Invoice #, transaction ID..." value="<%= searchQuery %>">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+        <option value="Paid" <%= selectedStatus === 'Paid' ? 'selected' : '' %>>Paid</option>
+        <option value="Partially Paid" <%= selectedStatus === 'Partially Paid' ? 'selected' : '' %>>Partially Paid</option>
+        <option value="Pending" <%= selectedStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+        <option value="Refunded" <%= selectedStatus === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="paymentMethod" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedMethod === 'all' ? 'selected' : '' %>>All Payment Methods</option>
+        <option value="UPI / Google Pay / PhonePe" <%= selectedMethod === 'UPI / Google Pay / PhonePe' ? 'selected' : '' %>>UPI / Google Pay / PhonePe</option>
+        <option value="Net Banking" <%= selectedMethod === 'Net Banking' ? 'selected' : '' %>>Net Banking</option>
+        <option value="Credit Card" <%= selectedMethod === 'Credit Card' ? 'selected' : '' %>>Credit Card</option>
+        <option value="Debit Card" <%= selectedMethod === 'Debit Card' ? 'selected' : '' %>>Debit Card</option>
+        <option value="Cash" <%= selectedMethod === 'Cash' ? 'selected' : '' %>>Cash</option>
+        <option value="NEFT / RTGS" <%= selectedMethod === 'NEFT / RTGS' ? 'selected' : '' %>>NEFT / RTGS</option>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-navy flex-grow-1">Filter</button>
+      <% if (searchQuery || selectedStatus !== 'all' || selectedMethod !== 'all') { %>
+        <a href="/payments" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Payments Table -->
+<div class="luxury-card overflow-hidden">
+  <% if (payments && payments.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Date</th>
+            <th>Guest</th>
+            <th>Booking #</th>
+            <th>Payment Method</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% payments.forEach(payment => { %>
+            <tr>
+              <td>
+                <a href="/payments/<%= payment._id %>/invoice" class="fw-bold text-dark text-decoration-none">
+                  <%= payment.invoiceNumber %>
+                </a>
+                <div class="text-muted font-monospace" style="font-size: 0.72rem;"><%= payment.transactionId || 'Manual' %></div>
+              </td>
+              <td><%= formatDateIN(payment.createdAt) %></td>
+              <td>
+                <% if (payment.guest) { %>
+                  <div class="fw-semibold text-dark"><%= payment.guest.firstName %> <%= payment.guest.lastName %></div>
+                <% } else { %>
+                  <span class="text-muted">N/A</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (payment.booking) { %>
+                  <a href="/bookings/<%= payment.booking._id %>" class="badge bg-light text-dark border text-decoration-none">
+                    <%= payment.booking.bookingNumber %>
+                  </a>
+                <% } else { %>
+                  <span class="text-muted">Direct</span>
+                <% } %>
+              </td>
+              <td>
+                <span class="badge bg-light text-secondary border">
+                  <i class="bi bi-wallet2 me-1"></i><%= payment.paymentMethod %>
+                </span>
+              </td>
+              <td class="fw-bold text-dark fs-6"><%= formatINR(payment.amount) %></td>
+              <td>
+                <span class="badge-status <%= payment.status.replace(/\s+/g, '_') %>"><%= payment.status %></span>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="/payments/<%= payment._id %>/invoice" class="btn btn-sm btn-light border" title="View Invoice">
+                    <i class="bi bi-receipt"></i>
+                  </a>
+
+                  <% if (currentUser && currentUser.role === 'Admin' && payment.status === 'Paid') { %>
+                    <form action="/payments/<%= payment._id %>/status?_method=PATCH" method="POST" class="d-inline" onsubmit="return confirm('Refund this payment of <%= formatINR(payment.amount) %>?');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                      <input type="hidden" name="status" value="Refunded">
+                      <button type="submit" class="btn btn-sm btn-outline-danger" title="Process Refund">
+                        <i class="bi bi-arrow-return-left"></i>
+                      </button>
+                    </form>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-3 border-top">
+      <%- include('../partials/pagination') %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-receipt fs-1 d-block mb-2 text-secondary"></i>
+      <h4 class="text-dark fw-bold">No payments found</h4>
+      <p class="small mb-3">No payments recorded matching your criteria.</p>
+      <a href="/payments/new" class="btn btn-gold"><i class="bi bi-credit-card me-1"></i> Record a Payment</a>
+    </div>
+  <% } %>
+</div>
+

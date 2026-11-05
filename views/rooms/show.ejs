@@ -1,0 +1,171 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <h1 class="h3 fw-bold mb-0 text-dark">Room <%= room.roomNumber %></h1>
+      <span class="badge-status <%= room.status %>"><%= room.status %></span>
+    </div>
+    <p class="text-muted small mb-0"><%= room.category ? room.category.name : 'Standard' %> • Floor <%= room.floor %> • Up to <%= room.capacity %> Guests</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/rooms" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i> Rooms List
+    </a>
+    <% if (currentUser && currentUser.role === 'Admin') { %>
+      <a href="/rooms/<%= room._id %>/edit" class="btn btn-gold">
+        <i class="bi bi-pencil me-1"></i> Edit Room
+      </a>
+      <form action="/rooms/<%= room._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete Room <%= room.roomNumber %>? This action will check for active reservations.');">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit" class="btn btn-outline-danger">
+          <i class="bi bi-trash me-1"></i> Delete
+        </button>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Room Image & Details -->
+  <div class="col-12 col-lg-7">
+    <div class="luxury-card overflow-hidden">
+      <img src="<%= room.primaryImage %>" alt="Room <%= room.roomNumber %>" class="w-100" style="height: 380px; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800'">
+      <div class="p-4">
+        <h5 class="fw-bold text-dark mb-2">Description</h5>
+        <p class="text-muted mb-4"><%= room.description || 'No description provided for this room.' %></p>
+
+        <h5 class="fw-bold text-dark mb-2">Amenities & Services</h5>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <% if (room.amenities && room.amenities.length > 0) { %>
+            <% room.amenities.forEach(amenity => { %>
+              <span class="badge bg-light text-dark border px-3 py-2 fs-6 fw-normal">
+                <i class="bi bi-check2 text-warning me-1"></i> <%= amenity %>
+              </span>
+            <% }); %>
+          <% } else { %>
+            <span class="text-muted small">Standard luxury amenities included.</span>
+          <% } %>
+        </div>
+
+        <!-- Quick Status Change Bar -->
+        <h5 class="fw-bold text-dark mb-2">Update Room Status</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <% ['Available', 'Occupied', 'Reserved', 'Maintenance'].forEach(st => { %>
+            <form action="/rooms/<%= room._id %>/status?_method=PATCH" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="status" value="<%= st %>">
+              <button type="submit" class="btn btn-sm <%= room.status === st ? 'btn-navy disabled' : 'btn-outline-secondary' %>">
+                <%= st %>
+              </button>
+            </form>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specifications Card & Booking Quick Action -->
+  <div class="col-12 col-lg-5">
+    <div class="luxury-card p-4 mb-4">
+      <h5 class="fw-bold text-dark mb-3">Room Specifications</h5>
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Rate per Night</span>
+          <span class="fw-bold text-dark fs-5"><%= formatINR(room.pricePerNight) %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Category</span>
+          <span class="fw-semibold text-dark"><%= room.category ? room.category.name : 'Standard' %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Max Occupancy</span>
+          <span class="fw-semibold text-dark"><%= room.capacity %> Guests</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Floor</span>
+          <span class="fw-semibold text-dark">Floor <%= room.floor %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Bed Configuration</span>
+          <span class="fw-semibold text-dark"><%= room.category ? room.category.bedType : 'King/Double' %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 py-2">
+          <span class="text-muted">Room Area</span>
+          <span class="fw-semibold text-dark"><%= room.category ? room.category.sizeSqFt : 350 %> sq ft</span>
+        </li>
+      </ul>
+
+      <% if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Receptionist')) { %>
+        <a href="/bookings/new?roomId=<%= room._id %>" class="btn btn-gold w-100 py-2">
+          <i class="bi bi-calendar-plus me-1"></i> Reserve This Room
+        </a>
+      <% } %>
+    </div>
+
+    <!-- Housekeeping Summary for this room -->
+    <div class="luxury-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold text-dark mb-0"><i class="bi bi-brush text-warning me-1"></i> Housekeeping History</h6>
+        <a href="/housekeeping/new?roomId=<%= room._id %>" class="btn btn-sm btn-outline-secondary">Schedule Task</a>
+      </div>
+
+      <% if (housekeepingHistory && housekeepingHistory.length > 0) { %>
+        <div class="list-group list-group-flush small">
+          <% housekeepingHistory.forEach(task => { %>
+            <div class="list-group-item px-0 py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-semibold text-dark"><%= task.taskType %></span>
+                <span class="badge bg-light text-dark border"><%= task.status %></span>
+              </div>
+              <div class="text-muted" style="font-size: 0.75rem;">
+                <%= task.assignedTo ? task.assignedTo.name : 'Unassigned' %> • <%= new Date(task.createdAt).toLocaleDateString() %>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="text-muted small mb-0">No recent cleaning tasks logged.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming Bookings Table -->
+<div class="luxury-card p-4">
+  <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-check text-primary me-2"></i>Upcoming & Active Reservations</h5>
+  <% if (upcomingBookings && upcomingBookings.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Booking #</th>
+            <th>Guest</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Status</th>
+            <th>Total Price</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% upcomingBookings.forEach(booking => { %>
+            <tr>
+              <td class="fw-bold"><%= booking.bookingNumber %></td>
+              <td><%= booking.guest ? booking.guest.firstName + ' ' + booking.guest.lastName : 'N/A' %></td>
+              <td><%= formatDateIN(booking.checkInDate) %></td>
+              <td><%= formatDateIN(booking.checkOutDate) %></td>
+              <td><span class="badge-status <%= booking.status.replace(/\s+/g, '_') %>"><%= booking.status %></span></td>
+              <td class="fw-bold text-dark"><%= formatINR(booking.totalPrice) %></td>
+              <td class="text-end">
+                <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></a>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <p class="text-muted small mb-0">No active or upcoming reservations found for this room.</p>
+  <% } %>
+</div>
+

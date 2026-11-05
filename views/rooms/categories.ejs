@@ -1,0 +1,107 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Room Categories</h1>
+    <p class="text-muted small mb-0">Manage room classifications, base pricing, and standard amenities.</p>
+  </div>
+  <a href="/rooms" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Rooms
+  </a>
+</div>
+
+<div class="row g-4">
+  <!-- Categories List -->
+  <div class="col-12 col-lg-7">
+    <div class="luxury-card p-4">
+      <h5 class="fw-bold text-dark mb-3">Available Room Categories</h5>
+      <div class="table-responsive">
+        <table class="table table-luxury align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Code</th>
+              <th>Base Rate</th>
+              <th>Max Guests</th>
+              <th>Bed Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% categories.forEach(cat => { %>
+              <tr>
+                <td>
+                  <div class="fw-bold text-dark"><%= cat.name %></div>
+                  <small class="text-muted"><%= cat.sizeSqFt %> sq ft</small>
+                </td>
+                <td><span class="badge bg-light text-dark border"><%= cat.code %></span></td>
+                <td class="fw-bold text-dark"><%= formatINR(cat.basePrice) %></td>
+                <td><%= cat.maxOccupancy %></td>
+                <td><%= cat.bedType %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Category Form -->
+  <div class="col-12 col-lg-5">
+    <div class="luxury-card p-4">
+      <h5 class="fw-bold text-dark mb-3">Add New Category</h5>
+      <form action="/rooms/categories" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="mb-3">
+          <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Presidential Penthouse" required>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label for="code" class="form-label">Code <span class="text-danger">*</span></label>
+            <input type="text" class="form-control text-uppercase" id="code" name="code" placeholder="PNT" maxlength="5" required>
+          </div>
+          <div class="col-6">
+            <label for="basePrice" class="form-label">Base Rate (₹) <span class="text-danger">*</span></label>
+            <input type="number" step="1" class="form-control" id="basePrice" name="basePrice" placeholder="8500" required>
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-4">
+            <label for="maxOccupancy" class="form-label">Max Guests</label>
+            <input type="number" class="form-control" id="maxOccupancy" name="maxOccupancy" value="2" min="1">
+          </div>
+          <div class="col-4">
+            <label for="bedType" class="form-label">Bed Type</label>
+            <select class="form-select" id="bedType" name="bedType">
+              <option value="King">King</option>
+              <option value="Queen">Queen</option>
+              <option value="Double" selected>Double</option>
+              <option value="Single">Single</option>
+              <option value="Twin">Twin</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <label for="sizeSqFt" class="form-label">Size (sq ft)</label>
+            <input type="number" class="form-control" id="sizeSqFt" name="sizeSqFt" value="400">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="amenities" class="form-label">Default Amenities (Comma-separated)</label>
+          <input type="text" class="form-control" id="amenities" name="amenities" placeholder="WiFi, AC, Jacuzzi, Ocean View">
+        </div>
+
+        <div class="mb-4">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="2" placeholder="Brief luxury category summary..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-gold w-100">
+          <i class="bi bi-plus-circle me-1"></i> Create Category
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+

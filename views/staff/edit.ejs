@@ -1,0 +1,98 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Edit Staff: <%= staff.user ? staff.user.name : staff.employeeId %></h1>
+    <p class="text-muted small mb-0">Update department, position, shift, or role assignment.</p>
+  </div>
+  <a href="/staff/<%= staff._id %>" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Profile
+  </a>
+</div>
+
+<div class="luxury-card p-4 mx-auto" style="max-width: 800px;">
+  <form action="/staff/<%= staff._id %>?_method=PUT" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lock text-warning me-2"></i>Account & Access Role</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="name" name="name" value="<%= staff.user ? staff.user.name : '' %>" required>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="role" class="form-label">System Role <span class="text-danger">*</span></label>
+        <select class="form-select" id="role" name="role" required>
+          <option value="Receptionist" <%= staff.user && staff.user.role === 'Receptionist' ? 'selected' : '' %>>Receptionist</option>
+          <option value="Housekeeping Staff" <%= staff.user && staff.user.role === 'Housekeeping Staff' ? 'selected' : '' %>>Housekeeping Staff</option>
+          <option value="Admin" <%= staff.user && staff.user.role === 'Admin' ? 'selected' : '' %>>Admin</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control" id="phone" name="phone" value="<%= staff.user ? staff.user.phone : '' %>">
+      </div>
+    </div>
+
+    <h5 class="fw-bold text-dark mb-3 border-top pt-3"><i class="bi bi-briefcase text-primary me-2"></i>Employment Details</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
+        <select class="form-select" id="department" name="department" required>
+          <option value="Front Desk" <%= staff.department === 'Front Desk' ? 'selected' : '' %>>Front Desk</option>
+          <option value="Management" <%= staff.department === 'Management' ? 'selected' : '' %>>Management</option>
+          <option value="Housekeeping" <%= staff.department === 'Housekeeping' ? 'selected' : '' %>>Housekeeping</option>
+          <option value="Maintenance" <%= staff.department === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+          <option value="Food & Beverage" <%= staff.department === 'Food & Beverage' ? 'selected' : '' %>>Food & Beverage</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="designation" class="form-label">Job Designation <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="designation" name="designation" value="<%= staff.designation %>" required>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="shift" class="form-label">Shift Timing</label>
+        <select class="form-select" id="shift" name="shift">
+          <option value="Morning" <%= staff.shift === 'Morning' ? 'selected' : '' %>>Morning</option>
+          <option value="Evening" <%= staff.shift === 'Evening' ? 'selected' : '' %>>Evening</option>
+          <option value="Night" <%= staff.shift === 'Night' ? 'selected' : '' %>>Night</option>
+          <option value="General" <%= staff.shift === 'General' ? 'selected' : '' %>>General</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="salary" class="form-label">Annual Salary (₹)</label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" class="form-control" id="salary" name="salary" value="<%= staff.salary %>">
+        </div>
+      </div>
+    </div>
+
+    <h5 class="fw-bold text-dark mb-3 border-top pt-3"><i class="bi bi-shield-heart text-danger me-2"></i>Emergency Contact</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <label for="emergencyName" class="form-label">Contact Name</label>
+        <input type="text" class="form-control" id="emergencyName" name="emergencyName" value="<%= staff.emergencyContact ? staff.emergencyContact.name : '' %>">
+      </div>
+      <div class="col-12 col-md-4">
+        <label for="emergencyRelation" class="form-label">Relationship</label>
+        <input type="text" class="form-control" id="emergencyRelation" name="emergencyRelation" value="<%= staff.emergencyContact ? staff.emergencyContact.relation : '' %>">
+      </div>
+      <div class="col-12 col-md-4">
+        <label for="emergencyPhone" class="form-label">Contact Phone</label>
+        <input type="tel" class="form-control" id="emergencyPhone" name="emergencyPhone" value="<%= staff.emergencyContact ? staff.emergencyContact.phone : '' %>">
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+      <a href="/staff/<%= staff._id %>" class="btn btn-outline-secondary">Cancel</a>
+      <button type="submit" class="btn btn-gold">
+        <i class="bi bi-check2-circle me-1"></i> Update Staff Details
+      </button>
+    </div>
+  </form>
+</div>
+

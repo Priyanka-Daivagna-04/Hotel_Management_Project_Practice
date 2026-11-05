@@ -1,0 +1,27 @@
+<% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center mb-0">
+      <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage - 1 %>" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+          <i class="bi bi-chevron-left"></i> Previous
+        </a>
+      </li>
+
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <% if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) { %>
+          <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+            <a class="page-link <%= currentPage === i ? 'bg-navy text-white' : '' %>" href="?page=<%= i %>"><%= i %></a>
+          </li>
+        <% } else if (i === currentPage - 3 || i === currentPage + 3) { %>
+          <li class="page-item disabled"><span class="page-link">...</span></li>
+        <% } %>
+      <% } %>
+
+      <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage + 1 %>" aria-disabled="<%= currentPage === totalPages %>">
+          Next <i class="bi bi-chevron-right"></i>
+        </a>
+      </li>
+    </ul>
+  </nav>
+<% } %>

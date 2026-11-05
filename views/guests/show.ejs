@@ -1,0 +1,135 @@
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark"><%= guest.fullName %></h1>
+    <p class="text-muted small mb-0">Guest Profile • Customer since <%= formatDateIN(guest.createdAt) %></p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/guests" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i> Guest List
+    </a>
+    <a href="/bookings/new?guestId=<%= guest._id %>" class="btn btn-gold">
+      <i class="bi bi-calendar-plus me-1"></i> New Booking for Guest
+    </a>
+    <a href="/guests/<%= guest._id %>/edit" class="btn btn-outline-secondary">
+      <i class="bi bi-pencil me-1"></i> Edit Details
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Guest Profile Card -->
+  <div class="col-12 col-md-5 col-lg-4">
+    <div class="luxury-card p-4 text-center">
+      <div class="mb-3">
+        <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(guest.fullName) %>&background=0f172a&color=c5a059&size=100" class="rounded-circle shadow-sm" alt="<%= guest.fullName %>">
+      </div>
+      <h5 class="fw-bold text-dark mb-1"><%= guest.fullName %></h5>
+      <span class="badge bg-light text-dark border mb-3"><%= guest.nationality || 'International Traveler' %></span>
+
+      <div class="text-start border-top pt-3">
+        <div class="mb-2">
+          <small class="text-muted d-block">Email Address</small>
+          <span class="text-dark fw-medium"><%= guest.email %></span>
+        </div>
+        <div class="mb-2">
+          <small class="text-muted d-block">Phone Number</small>
+          <span class="text-dark fw-medium"><%= guest.phone %></span>
+        </div>
+        <div class="mb-2">
+          <small class="text-muted d-block">Identification</small>
+          <span class="text-dark fw-medium"><%= guest.idType %>: <%= guest.idNumber || 'Not recorded' %></span>
+        </div>
+        <div class="mb-2">
+          <small class="text-muted d-block">Residential Address</small>
+          <span class="text-dark fw-medium">
+            <%= [guest.address?.street, guest.address?.city, guest.address?.state, guest.address?.country, guest.address?.zipCode].filter(Boolean).join(', ') || 'No address registered' %>
+          </span>
+        </div>
+        <% if (guest.specialRequests) { %>
+          <div class="mt-3 p-2 bg-light rounded small">
+            <strong class="text-dark d-block">Preferences:</strong>
+            <span class="text-muted"><%= guest.specialRequests %></span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stay History & Financials -->
+  <div class="col-12 col-md-7 col-lg-8">
+    <!-- Booking History -->
+    <div class="luxury-card p-4 mb-4">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar-check text-primary me-2"></i>Reservation History</h5>
+      <% if (bookings && bookings.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-sm table-luxury align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Booking #</th>
+                <th>Room</th>
+                <th>Stay Dates</th>
+                <th>Status</th>
+                <th>Total</th>
+                <th class="text-end">Voucher</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% bookings.forEach(b => { %>
+                <tr>
+                  <td class="fw-bold"><%= b.bookingNumber %></td>
+                  <td>Room <%= b.room ? b.room.roomNumber : 'N/A' %></td>
+                  <td><%= formatDateIN(b.checkInDate) %> &rarr; <%= formatDateIN(b.checkOutDate) %></td>
+                  <td><span class="badge-status <%= b.status.replace(/\s+/g, '_') %>"><%= b.status %></span></td>
+                  <td class="fw-bold text-dark"><%= formatINR(b.totalPrice) %></td>
+                  <td class="text-end">
+                    <a href="/bookings/<%= b._id %>" class="btn btn-sm btn-light border"><i class="bi bi-eye"></i></a>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <p class="text-muted small mb-0">No past reservations for this guest.</p>
+      <% } %>
+    </div>
+
+    <!-- Payments Ledger -->
+    <div class="luxury-card p-4">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-credit-card text-success me-2"></i>Payment History</h5>
+      <% if (payments && payments.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-sm table-luxury align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th class="text-end">Folio</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% payments.forEach(p => { %>
+                <tr>
+                  <td class="fw-semibold"><%= p.invoiceNumber %></td>
+                  <td><%= formatDateIN(p.createdAt) %></td>
+                  <td><%= p.paymentMethod %></td>
+                  <td class="fw-bold text-dark"><%= formatINR(p.amount) %></td>
+                  <td><span class="badge-status <%= p.status %>"><%= p.status %></span></td>
+                  <td class="text-end">
+                    <a href="/payments/<%= p._id %>/invoice" class="btn btn-sm btn-light border"><i class="bi bi-receipt"></i></a>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <p class="text-muted small mb-0">No payment records found.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+

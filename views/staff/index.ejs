@@ -1,0 +1,144 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Staff Directory & RBAC</h1>
+    <p class="text-muted small mb-0">Manage hotel staff profiles, departmental assignments, and role-based access permissions.</p>
+  </div>
+  <a href="/staff/new" class="btn btn-gold">
+    <i class="bi bi-person-plus me-1"></i> Add Staff Member
+  </a>
+</div>
+
+<!-- Filters Toolbar -->
+<div class="luxury-card p-3 mb-4">
+  <form action="/staff" method="GET" class="row g-2 align-items-center">
+    <div class="col-12 col-md-4">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Search by name, employee ID, email..." value="<%= searchQuery %>">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="department" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedDepartment === 'all' ? 'selected' : '' %>>All Departments</option>
+        <option value="Management" <%= selectedDepartment === 'Management' ? 'selected' : '' %>>Management</option>
+        <option value="Front Desk" <%= selectedDepartment === 'Front Desk' ? 'selected' : '' %>>Front Desk</option>
+        <option value="Housekeeping" <%= selectedDepartment === 'Housekeeping' ? 'selected' : '' %>>Housekeeping</option>
+        <option value="Maintenance" <%= selectedDepartment === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+        <option value="Food & Beverage" <%= selectedDepartment === 'Food & Beverage' ? 'selected' : '' %>>Food & Beverage</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="role" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedRole === 'all' ? 'selected' : '' %>>All System Roles</option>
+        <option value="Admin" <%= selectedRole === 'Admin' ? 'selected' : '' %>>Admin</option>
+        <option value="Receptionist" <%= selectedRole === 'Receptionist' ? 'selected' : '' %>>Receptionist</option>
+        <option value="Housekeeping Staff" <%= selectedRole === 'Housekeeping Staff' ? 'selected' : '' %>>Housekeeping Staff</option>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-navy flex-grow-1">Filter</button>
+      <% if (searchQuery || selectedDepartment !== 'all' || selectedRole !== 'all') { %>
+        <a href="/staff" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Staff Directory Table -->
+<div class="luxury-card overflow-hidden">
+  <% if (staffList && staffList.length > 0) { %>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Staff Member</th>
+            <th>Employee ID</th>
+            <th>Department & Shift</th>
+            <th>Designation</th>
+            <th>System Role</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% staffList.forEach(member => { %>
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(member.user ? member.user.name : 'Staff') %>&background=0f172a&color=c5a059&size=40" class="rounded-circle" width="36" height="36" alt="Avatar">
+                  <div>
+                    <a href="/staff/<%= member._id %>" class="fw-bold text-dark text-decoration-none">
+                      <%= member.user ? member.user.name : 'Unknown' %>
+                    </a>
+                    <div class="text-muted" style="font-size: 0.75rem;"><%= member.user ? member.user.email : '' %></div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-light text-dark border font-monospace"><%= member.employeeId %></span></td>
+              <td>
+                <div class="fw-semibold text-dark"><%= member.department %></div>
+                <small class="text-muted"><%= member.shift %> Shift</small>
+              </td>
+              <td><%= member.designation %></td>
+              <td>
+                <span class="badge <%= member.user && member.user.role === 'Admin' ? 'bg-primary' : (member.user && member.user.role === 'Receptionist' ? 'bg-success' : 'bg-warning text-dark') %>">
+                  <%= member.user ? member.user.role : 'No Role' %>
+                </span>
+              </td>
+              <td>
+                <% if (member.isActive) { %>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">Active</span>
+                <% } else { %>
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Inactive</span>
+                <% } %>
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a href="/staff/<%= member._id %>" class="btn btn-sm btn-light border" title="View Profile">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="/staff/<%= member._id %>/edit" class="btn btn-sm btn-light border" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+
+                  <!-- Status Toggle Form -->
+                  <form action="/staff/<%= member._id %>/status?_method=PATCH" method="POST" class="d-inline">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-sm <%= member.isActive ? 'btn-outline-warning' : 'btn-outline-success' %>" title="<%= member.isActive ? 'Deactivate' : 'Activate' %>">
+                      <i class="bi <%= member.isActive ? 'bi-person-slash' : 'bi-person-check' %>"></i>
+                    </button>
+                  </form>
+
+                  <!-- Delete -->
+                  <form action="/staff/<%= member._id %>?_method=DELETE" method="POST" class="d-inline" onsubmit="return confirm('Permanently remove staff member <%= member.user ? member.user.name : '' %> and revoke system access?');">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <button type="submit" class="btn btn-sm btn-light border text-danger" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-3 border-top">
+      <%- include('../partials/pagination') %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-people fs-1 d-block mb-2 text-secondary"></i>
+      <h4 class="text-dark fw-bold">No staff found</h4>
+      <p class="small mb-3">No staff members registered matching your query.</p>
+      <a href="/staff/new" class="btn btn-gold"><i class="bi bi-person-plus me-1"></i> Add Staff Member</a>
+    </div>
+  <% } %>
+</div>
+

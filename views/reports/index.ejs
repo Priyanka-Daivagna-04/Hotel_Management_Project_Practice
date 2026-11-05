@@ -1,0 +1,377 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Analytics & Management Reports</h1>
+    <p class="text-muted small mb-0">Aggregate revenue, occupancy trends, booking history, and operational performance.</p>
+  </div>
+  <a href="/reports/export?type=<%= reportType %>&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-gold">
+    <i class="bi bi-file-earmark-spreadsheet me-1"></i> Export to CSV
+  </a>
+</div>
+
+<!-- Report Navigation Tabs & Date Filter -->
+<div class="luxury-card p-3 mb-4">
+  <div class="d-flex flex-wrap gap-2 mb-3 pb-3 border-bottom">
+    <a href="/reports?type=revenue&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-sm <%= reportType === 'revenue' ? 'btn-navy' : 'btn-outline-secondary' %>">
+      <i class="bi bi-currency-dollar me-1"></i> Revenue Report
+    </a>
+    <a href="/reports?type=occupancy&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-sm <%= reportType === 'occupancy' ? 'btn-navy' : 'btn-outline-secondary' %>">
+      <i class="bi bi-pie-chart me-1"></i> Room Occupancy
+    </a>
+    <a href="/reports?type=bookings&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-sm <%= reportType === 'bookings' ? 'btn-navy' : 'btn-outline-secondary' %>">
+      <i class="bi bi-calendar-check me-1"></i> Booking Production
+    </a>
+    <a href="/reports?type=checkin_checkout&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-sm <%= reportType === 'checkin_checkout' ? 'btn-navy' : 'btn-outline-secondary' %>">
+      <i class="bi bi-arrow-left-right me-1"></i> Arrivals & Departures
+    </a>
+    <a href="/reports?type=guests&startDate=<%= startDate %>&endDate=<%= endDate %>" class="btn btn-sm <%= reportType === 'guests' ? 'btn-navy' : 'btn-outline-secondary' %>">
+      <i class="bi bi-people me-1"></i> Guest Registration
+    </a>
+  </div>
+
+  <form action="/reports" method="GET" class="row g-2 align-items-end">
+    <input type="hidden" name="type" value="<%= reportType %>">
+
+    <div class="col-12 col-sm-4 col-md-3">
+      <label for="startDate" class="form-label small mb-1">Start Date</label>
+      <input type="date" class="form-control form-control-sm" id="startDate" name="startDate" value="<%= startDate %>">
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-3">
+      <label for="endDate" class="form-label small mb-1">End Date</label>
+      <input type="date" class="form-control form-control-sm" id="endDate" name="endDate" value="<%= endDate %>">
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-3">
+      <button type="submit" class="btn btn-sm btn-navy w-100">
+        <i class="bi bi-funnel me-1"></i> Apply Filter
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Dynamic Report Content -->
+<% if (reportType === 'revenue') { %>
+  <!-- Revenue Summary Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-md-6">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Total Revenue Collected</div>
+          <div class="stat-value text-success"><%= formatINR(reportData.summary.totalRevenue) %></div>
+          <small class="text-muted"><%= reportData.summary.totalTransactions || 0 %> settled transactions</small>
+        </div>
+        <div class="stat-icon gold"><i class="bi bi-currency-rupee"></i></div>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Top Payment Methods</div>
+          <div class="d-flex flex-wrap gap-2 mt-2">
+            <% if (reportData.summary.byMethod) { %>
+              <% Object.entries(reportData.summary.byMethod).forEach(([m, amt]) => { %>
+                <span class="badge bg-light text-dark border p-2">
+                  <%= m %>: <%= formatINR(amt) %>
+                </span>
+              <% }); %>
+            <% } %>
+          </div>
+        </div>
+        <div class="stat-icon blue"><i class="bi bi-wallet2"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Transactions Ledger -->
+  <div class="luxury-card overflow-hidden">
+    <div class="p-3 border-bottom bg-light">
+      <h6 class="fw-bold text-dark mb-0">Itemized Payment Collections (<%= startDate %> to <%= endDate %>)</h6>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Date</th>
+            <th>Guest</th>
+            <th>Booking #</th>
+            <th>Method</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData.rows && reportData.rows.length > 0) { %>
+            <% reportData.rows.forEach(p => { %>
+              <tr>
+                <td class="fw-bold font-monospace"><%= p.invoiceNumber %></td>
+                <td><%= formatDateIN(p.createdAt) %></td>
+                <td><%= p.guest ? p.guest.firstName + ' ' + p.guest.lastName : 'N/A' %></td>
+                <td><%= p.booking ? p.booking.bookingNumber : 'Direct' %></td>
+                <td><span class="badge bg-light text-secondary border"><%= p.paymentMethod %></span></td>
+                <td class="fw-bold text-dark"><%= formatINR(p.amount) %></td>
+                <td><span class="badge-status <%= p.status %>"><%= p.status %></span></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-center py-4 text-muted">No revenue records found for this period.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<% } else if (reportType === 'occupancy') { %>
+  <!-- Occupancy Summary -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Occupancy Rate</div>
+          <div class="stat-value text-primary"><%= reportData.summary.occupancyRate %>%</div>
+        </div>
+        <div class="stat-icon blue"><i class="bi bi-pie-chart"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Available</div>
+          <div class="stat-value text-success"><%= reportData.summary.availableRooms %></div>
+        </div>
+        <div class="stat-icon green"><i class="bi bi-door-open"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Occupied</div>
+          <div class="stat-value text-primary"><%= reportData.summary.occupiedRooms %></div>
+        </div>
+        <div class="stat-icon purple"><i class="bi bi-door-closed"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Maintenance</div>
+          <div class="stat-value text-danger"><%= reportData.summary.maintenanceRooms %></div>
+        </div>
+        <div class="stat-icon red"><i class="bi bi-tools"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="luxury-card overflow-hidden">
+    <div class="p-3 border-bottom bg-light">
+      <h6 class="fw-bold text-dark mb-0">Inventory Occupancy Status</h6>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Room #</th>
+            <th>Category</th>
+            <th>Floor</th>
+            <th>Capacity</th>
+            <th>Rate / Night (₹)</th>
+            <th>Current Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData.rows && reportData.rows.length > 0) { %>
+            <% reportData.rows.forEach(r => { %>
+              <tr>
+                <td class="fw-bold"><%= r.roomNumber %></td>
+                <td><%= r.category ? r.category.name : 'Standard' %></td>
+                <td>Floor <%= r.floor %></td>
+                <td><%= r.capacity %> Guests</td>
+                <td class="fw-bold text-dark"><%= formatINR(r.pricePerNight) %></td>
+                <td><span class="badge-status <%= r.status %>"><%= r.status %></span></td>
+              </tr>
+            <% }); %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<% } else if (reportType === 'bookings') { %>
+  <!-- Bookings Summary -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Total Bookings</div>
+          <div class="stat-value"><%= reportData.summary.totalBookings %></div>
+        </div>
+        <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Gross Value</div>
+          <div class="stat-value text-success"><%= formatINR(reportData.summary.totalValue) %></div>
+        </div>
+        <div class="stat-icon gold"><i class="bi bi-currency-rupee"></i></div>
+      </div>
+    </div>
+    <div class="col-12 col-md-4">
+      <div class="stat-card">
+        <div>
+          <div class="stat-label">Avg Length of Stay</div>
+          <div class="stat-value"><%= reportData.summary.avgLengthOfStay %> <span class="fs-6 fw-normal text-muted">nights</span></div>
+        </div>
+        <div class="stat-icon purple"><i class="bi bi-clock-history"></i></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="luxury-card overflow-hidden">
+    <div class="p-3 border-bottom bg-light">
+      <h6 class="fw-bold text-dark mb-0">Booking Production Report</h6>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Booking #</th>
+            <th>Guest</th>
+            <th>Room</th>
+            <th>Check-In & Out</th>
+            <th>Nights</th>
+            <th>Gross Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData.rows && reportData.rows.length > 0) { %>
+            <% reportData.rows.forEach(b => { %>
+              <tr>
+                <td class="fw-bold"><%= b.bookingNumber %></td>
+                <td><%= b.guest ? b.guest.firstName + ' ' + b.guest.lastName : 'N/A' %></td>
+                <td>Room <%= b.room ? b.room.roomNumber : 'N/A' %></td>
+                <td><%= formatDateIN(b.checkInDate) %> &rarr; <%= formatDateIN(b.checkOutDate) %></td>
+                <td><%= b.nights %></td>
+                <td class="fw-bold text-dark"><%= formatINR(b.totalPrice) %></td>
+                <td><span class="badge-status <%= b.status.replace(/\s+/g, '_') %>"><%= b.status %></span></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="7" class="text-center py-4 text-muted">No reservations recorded in this date range.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<% } else if (reportType === 'checkin_checkout') { %>
+  <!-- Check-in & Check-out Summary -->
+  <div class="row g-4">
+    <!-- Check Ins -->
+    <div class="col-12 col-lg-6">
+      <div class="luxury-card p-4">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-box-arrow-in-right text-success me-2"></i>Arrivals (<%= reportData.summary.checkInsCount %>)</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-luxury align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Booking #</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Check-In Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (reportData.checkIns && reportData.checkIns.length > 0) { %>
+                <% reportData.checkIns.forEach(b => { %>
+                  <tr>
+                    <td class="fw-bold"><%= b.bookingNumber %></td>
+                    <td><%= b.guest ? b.guest.firstName + ' ' + b.guest.lastName : 'N/A' %></td>
+                    <td>Room <%= b.room ? b.room.roomNumber : '' %></td>
+                    <td><%= new Date(b.checkInDate).toLocaleDateString() %></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr><td colspan="4" class="text-center text-muted py-3">No arrivals scheduled.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Check Outs -->
+    <div class="col-12 col-lg-6">
+      <div class="luxury-card p-4">
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-box-arrow-right text-primary me-2"></i>Departures (<%= reportData.summary.checkOutsCount %>)</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-luxury align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Booking #</th>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Check-Out Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (reportData.checkOuts && reportData.checkOuts.length > 0) { %>
+                <% reportData.checkOuts.forEach(b => { %>
+                  <tr>
+                    <td class="fw-bold"><%= b.bookingNumber %></td>
+                    <td><%= b.guest ? b.guest.firstName + ' ' + b.guest.lastName : 'N/A' %></td>
+                    <td>Room <%= b.room ? b.room.roomNumber : '' %></td>
+                    <td><%= new Date(b.checkOutDate).toLocaleDateString() %></td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr><td colspan="4" class="text-center text-muted py-3">No departures scheduled.</td></tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<% } else if (reportType === 'guests') { %>
+  <div class="luxury-card overflow-hidden">
+    <div class="p-3 border-bottom bg-light">
+      <h6 class="fw-bold text-dark mb-0">Guest Registrations (<%= reportData.summary.totalNewGuests %> Total)</h6>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-luxury align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>ID Type</th>
+            <th>Nationality</th>
+            <th>Registered Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (reportData.rows && reportData.rows.length > 0) { %>
+            <% reportData.rows.forEach(g => { %>
+              <tr>
+                <td class="fw-bold"><%= g.firstName %> <%= g.lastName %></td>
+                <td><%= g.email %></td>
+                <td><%= g.phone %></td>
+                <td><%= g.idType %>: <%= g.idNumber || '—' %></td>
+                <td><%= g.nationality || '—' %></td>
+                <td><%= new Date(g.createdAt).toLocaleDateString() %></td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr><td colspan="6" class="text-center py-4 text-muted">No guest records found in this range.</td></tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% } %>
+

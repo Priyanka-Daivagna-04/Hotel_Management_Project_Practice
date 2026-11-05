@@ -1,0 +1,99 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Edit Room <%= room.roomNumber %></h1>
+    <p class="text-muted small mb-0">Update room configuration, pricing, or status.</p>
+  </div>
+  <a href="/rooms/<%= room._id %>" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Room Details
+  </a>
+</div>
+
+<div class="luxury-card p-4 mx-auto" style="max-width: 800px;">
+  <form action="/rooms/<%= room._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <div class="row g-3">
+      <!-- Room Number -->
+      <div class="col-12 col-md-6">
+        <label for="roomNumber" class="form-label">Room Number <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="roomNumber" name="roomNumber" value="<%= room.roomNumber %>" required>
+      </div>
+
+      <!-- Category -->
+      <div class="col-12 col-md-6">
+        <label for="category" class="form-label">Room Category <span class="text-danger">*</span></label>
+        <select class="form-select" id="category" name="category" required>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat._id %>" <%= room.category && room.category.toString() === cat._id.toString() ? 'selected' : '' %>>
+              <%= cat.name %> (<%= formatINR(cat.basePrice) %>/nt)
+            </option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Floor -->
+      <div class="col-12 col-md-4">
+        <label for="floor" class="form-label">Floor Number <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" id="floor" name="floor" value="<%= room.floor %>" min="1" max="100" required>
+      </div>
+
+      <!-- Capacity -->
+      <div class="col-12 col-md-4">
+        <label for="capacity" class="form-label">Max Capacity <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" id="capacity" name="capacity" value="<%= room.capacity %>" min="1" max="10" required>
+      </div>
+
+      <!-- Price Per Night -->
+      <div class="col-12 col-md-4">
+        <label for="pricePerNight" class="form-label">Price Per Night (₹) <span class="text-danger">*</span></label>
+        <div class="input-group">
+          <span class="input-group-text">₹</span>
+          <input type="number" step="1" class="form-control" id="pricePerNight" name="pricePerNight" value="<%= room.pricePerNight %>" required>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-12 col-md-6">
+        <label for="status" class="form-label">Room Status</label>
+        <select class="form-select" id="status" name="status">
+          <option value="Available" <%= room.status === 'Available' ? 'selected' : '' %>>Available</option>
+          <option value="Occupied" <%= room.status === 'Occupied' ? 'selected' : '' %>>Occupied</option>
+          <option value="Reserved" <%= room.status === 'Reserved' ? 'selected' : '' %>>Reserved</option>
+          <option value="Maintenance" <%= room.status === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+        </select>
+      </div>
+
+      <!-- Image Upload -->
+      <div class="col-12 col-md-6">
+        <label for="image" class="form-label">Update Room Photo (Upload)</label>
+        <input type="file" class="form-control" id="image" name="image" accept="image/*">
+      </div>
+
+      <!-- Image URL Alternative -->
+      <div class="col-12">
+        <label for="imageUrl" class="form-label">Or External Image URL</label>
+        <input type="url" class="form-control" id="imageUrl" name="imageUrl" value="<%= room.images && room.images.length > 0 ? room.images[0] : '' %>" placeholder="https://images.unsplash.com/...">
+      </div>
+
+      <!-- Amenities -->
+      <div class="col-12">
+        <label for="amenities" class="form-label">Amenities (Comma-separated)</label>
+        <input type="text" class="form-control" id="amenities" name="amenities" value="<%= room.amenities ? room.amenities.join(', ') : '' %>">
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <label for="description" class="form-label">Room Description</label>
+        <textarea class="form-control" id="description" name="description" rows="3"><%= room.description %></textarea>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end gap-2 pt-3 border-top">
+        <a href="/rooms/<%= room._id %>" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-gold">
+          <i class="bi bi-check2-circle me-1"></i> Update Room
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+

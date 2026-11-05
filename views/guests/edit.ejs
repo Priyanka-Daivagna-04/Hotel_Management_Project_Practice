@@ -1,0 +1,104 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Edit Guest: <%= guest.fullName %></h1>
+    <p class="text-muted small mb-0">Update contact information or preferences.</p>
+  </div>
+  <a href="/guests/<%= guest._id %>" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Profile
+  </a>
+</div>
+
+<div class="luxury-card p-4 mx-auto" style="max-width: 800px;">
+  <form action="/guests/<%= guest._id %>?_method=PUT" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person text-warning me-2"></i>Personal Details</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-6">
+        <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="firstName" name="firstName" value="<%= guest.firstName %>" required>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="lastName" name="lastName" value="<%= guest.lastName %>" required>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+        <input type="email" class="form-control" id="email" name="email" value="<%= guest.email %>" required>
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+        <input type="tel" class="form-control" id="phone" name="phone" value="<%= guest.phone %>" required>
+      </div>
+    </div>
+
+    <h5 class="fw-bold text-dark mb-3 border-top pt-3"><i class="bi bi-card-text text-primary me-2"></i>Identification & Nationality</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <label for="idType" class="form-label">ID Type</label>
+        <select class="form-select" id="idType" name="idType">
+          <option value="Aadhaar Card" <%= guest.idType === 'Aadhaar Card' ? 'selected' : '' %>>Aadhaar Card</option>
+          <option value="PAN Card" <%= guest.idType === 'PAN Card' ? 'selected' : '' %>>PAN Card</option>
+          <option value="Driving License" <%= guest.idType === 'Driving License' ? 'selected' : '' %>>Driving License</option>
+          <option value="Voter ID" <%= guest.idType === 'Voter ID' ? 'selected' : '' %>>Voter ID</option>
+          <option value="Passport" <%= guest.idType === 'Passport' ? 'selected' : '' %>>Passport</option>
+          <option value="Other" <%= guest.idType === 'Other' ? 'selected' : '' %>>Other</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label for="idNumber" class="form-label">ID / Passport Number</label>
+        <input type="text" class="form-control font-monospace" id="idNumber" name="idNumber" value="<%= guest.idNumber %>">
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label for="nationality" class="form-label">Nationality</label>
+        <input type="text" class="form-control" id="nationality" name="nationality" value="<%= guest.nationality %>">
+      </div>
+    </div>
+
+    <h5 class="fw-bold text-dark mb-3 border-top pt-3"><i class="bi bi-geo-alt text-danger me-2"></i>Residential Address</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-12">
+        <label for="street" class="form-label">Street Address</label>
+        <input type="text" class="form-control" id="street" name="street" value="<%= guest.address ? guest.address.street : '' %>">
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label for="city" class="form-label">City</label>
+        <input type="text" class="form-control" id="city" name="city" value="<%= guest.address ? guest.address.city : '' %>">
+      </div>
+
+      <div class="col-12 col-md-3">
+        <label for="state" class="form-label">State / Province</label>
+        <input type="text" class="form-control" id="state" name="state" value="<%= guest.address ? guest.address.state : '' %>">
+      </div>
+
+      <div class="col-12 col-md-3">
+        <label for="country" class="form-label">Country</label>
+        <input type="text" class="form-control" id="country" name="country" value="<%= guest.address ? guest.address.country : '' %>">
+      </div>
+
+      <div class="col-12 col-md-2">
+        <label for="zipCode" class="form-label">Zip / Postcode</label>
+        <input type="text" class="form-control" id="zipCode" name="zipCode" value="<%= guest.address ? guest.address.zipCode : '' %>">
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="specialRequests" class="form-label">Guest Preferences & Notes</label>
+      <textarea class="form-control" id="specialRequests" name="specialRequests" rows="3"><%= guest.specialRequests %></textarea>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+      <a href="/guests/<%= guest._id %>" class="btn btn-outline-secondary">Cancel</a>
+      <button type="submit" class="btn btn-gold">
+        <i class="bi bi-check2-circle me-1"></i> Update Profile
+      </button>
+    </div>
+  </form>
+</div>
+

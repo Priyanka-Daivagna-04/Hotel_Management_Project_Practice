@@ -1,0 +1,166 @@
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Room Management</h1>
+    <p class="text-muted small mb-0">Browse, filter, monitor occupancy and manage hotel room inventory.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <% if (currentUser && currentUser.role === 'Admin') { %>
+      <a href="/rooms/categories" class="btn btn-outline-secondary bg-white">
+        <i class="bi bi-tags me-1"></i> Categories
+      </a>
+      <a href="/rooms/new" class="btn btn-gold">
+        <i class="bi bi-plus-lg me-1"></i> Add Room
+      </a>
+    <% } %>
+  </div>
+</div>
+
+<!-- Filters & Search Toolbar -->
+<div class="luxury-card p-3 mb-4">
+  <form action="/rooms" method="GET" class="row g-2 align-items-center">
+    <div class="col-12 col-md-4">
+      <div class="input-group">
+        <span class="input-group-text bg-light text-muted border-end-0"><i class="bi bi-search"></i></span>
+        <input type="text" name="search" class="form-control border-start-0" placeholder="Search by room # or description..." value="<%= searchQuery %>">
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="status" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedStatus === 'all' ? 'selected' : '' %>>All Statuses</option>
+        <option value="Available" <%= selectedStatus === 'Available' ? 'selected' : '' %>>Available</option>
+        <option value="Occupied" <%= selectedStatus === 'Occupied' ? 'selected' : '' %>>Occupied</option>
+        <option value="Reserved" <%= selectedStatus === 'Reserved' ? 'selected' : '' %>>Reserved</option>
+        <option value="Maintenance" <%= selectedStatus === 'Maintenance' ? 'selected' : '' %>>Maintenance</option>
+      </select>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <select name="category" class="form-select" onchange="this.form.submit()">
+        <option value="all" <%= selectedCategory === 'all' ? 'selected' : '' %>>All Categories</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat._id %>" <%= selectedCategory === cat._id.toString() ? 'selected' : '' %>>
+            <%= cat.name %>
+          </option>
+        <% }); %>
+      </select>
+    </div>
+
+    <div class="col-12 col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-navy w-100">Filter</button>
+      <% if (searchQuery || selectedStatus !== 'all' || selectedCategory !== 'all') { %>
+        <a href="/rooms" class="btn btn-outline-secondary" title="Reset Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+      <% } %>
+    </div>
+  </form>
+</div>
+
+<!-- Room Cards Grid -->
+<% if (rooms && rooms.length > 0) { %>
+  <div class="row g-4">
+    <% rooms.forEach(room => { %>
+      <div class="col-12 col-md-6 col-lg-4">
+        <div class="room-card">
+          <!-- Room Image & Overlay Badges -->
+          <div class="room-card-img-wrapper">
+            <img src="<%= room.primaryImage %>" alt="Room <%= room.roomNumber %>" class="room-card-img" onerror="this.src='https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600'">
+            <div class="room-badge-overlay">
+              <span class="badge-status <%= room.status %>"><%= room.status %></span>
+            </div>
+            <div class="room-price-overlay">
+              <%= formatINR(room.pricePerNight) %> <span>/ night</span>
+            </div>
+          </div>
+
+          <!-- Room Body -->
+          <div class="p-3 d-flex flex-column flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h5 class="fw-bold mb-0 text-dark">Room <%= room.roomNumber %></h5>
+                <span class="text-muted small"><%= room.category ? room.category.name : 'Standard' %></span>
+              </div>
+              <span class="badge bg-light text-dark border">Floor <%= room.floor %></span>
+            </div>
+
+            <p class="text-muted small mb-3 flex-grow-1" style="min-height: 38px;">
+              <%= room.description ? (room.description.length > 80 ? room.description.substring(0, 80) + '...' : room.description) : 'Deluxe hospitality room equipped with modern comfort.' %>
+            </p>
+
+            <div class="d-flex align-items-center gap-3 text-muted small mb-3 border-top border-bottom py-2">
+              <span><i class="bi bi-people me-1"></i> Up to <%= room.capacity %> Guests</span>
+              <span><i class="bi bi-aspect-ratio me-1"></i> <%= room.category ? room.category.sizeSqFt : 350 %> sq ft</span>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <a href="/rooms/<%= room._id %>" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-info-circle me-1"></i> Details
+              </a>
+
+              <div class="d-flex gap-1">
+                <!-- Status Quick Change Dropdown -->
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light border dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Status
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.85rem;">
+                    <li>
+                      <form action="/rooms/<%= room._id %>/status?_method=PATCH" method="POST" class="m-0">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="status" value="Available">
+                        <button type="submit" class="dropdown-item text-success"><i class="bi bi-check-circle me-1"></i> Available</button>
+                      </form>
+                    </li>
+                    <li>
+                      <form action="/rooms/<%= room._id %>/status?_method=PATCH" method="POST" class="m-0">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="status" value="Occupied">
+                        <button type="submit" class="dropdown-item text-primary"><i class="bi bi-door-closed me-1"></i> Occupied</button>
+                      </form>
+                    </li>
+                    <li>
+                      <form action="/rooms/<%= room._id %>/status?_method=PATCH" method="POST" class="m-0">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="status" value="Reserved">
+                        <button type="submit" class="dropdown-item text-warning"><i class="bi bi-clock me-1"></i> Reserved</button>
+                      </form>
+                    </li>
+                    <li>
+                      <form action="/rooms/<%= room._id %>/status?_method=PATCH" method="POST" class="m-0">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="hidden" name="status" value="Maintenance">
+                        <button type="submit" class="dropdown-item text-danger"><i class="bi bi-tools me-1"></i> Maintenance</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+
+                <% if (currentUser && currentUser.role === 'Admin') { %>
+                  <a href="/rooms/<%= room._id %>/edit" class="btn btn-sm btn-light border" title="Edit Room">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <!-- Pagination Partial -->
+  <%- include('../partials/pagination') %>
+<% } else { %>
+  <div class="luxury-card text-center py-5">
+    <div class="py-4">
+      <i class="bi bi-door-closed display-4 text-secondary mb-3 d-block"></i>
+      <h4 class="text-dark fw-bold">No rooms found</h4>
+      <p class="text-muted small">No rooms match your filter criteria. Try adjusting your search query.</p>
+      <% if (currentUser && currentUser.role === 'Admin') { %>
+        <a href="/rooms/new" class="btn btn-gold mt-2"><i class="bi bi-plus-lg me-1"></i> Add Room</a>
+      <% } %>
+    </div>
+  </div>
+<% } %>
+

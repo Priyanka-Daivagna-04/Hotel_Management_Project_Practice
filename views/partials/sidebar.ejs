@@ -1,0 +1,97 @@
+<aside class="sidebar" id="appSidebar">
+  <!-- Brand Header -->
+  <div class="sidebar-brand">
+    <a href="/dashboard">
+      <div class="brand-icon">
+        <i class="bi bi-gem"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-title">Grand Royale</span>
+        <span class="brand-subtitle">Hotel & Resorts</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Navigation Menu -->
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Main</div>
+    <a href="/dashboard" class="sidebar-link <%= currentPath === '/dashboard' ? 'active' : '' %>">
+      <i class="bi bi-speedometer2"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <!-- Hospitality Operations -->
+    <div class="nav-section-title">Operations</div>
+    <a href="/rooms" class="sidebar-link <%= currentPath.startsWith('/rooms') ? 'active' : '' %>">
+      <i class="bi bi-door-open"></i>
+      <span>Room Management</span>
+    </a>
+
+    <% if (currentUser && (currentUser.role==='Admin' || currentUser.role==='Receptionist' )) { %>
+      <a href="/bookings" class="sidebar-link <%= currentPath.startsWith('/bookings') ? 'active' : '' %>">
+        <i class="bi bi-calendar-check"></i>
+        <span>Reservations</span>
+      </a>
+
+      <a href="/guests" class="sidebar-link <%= currentPath.startsWith('/guests') ? 'active' : '' %>">
+        <i class="bi bi-people"></i>
+        <span>Guests Directory</span>
+      </a>
+
+      <a href="/payments" class="sidebar-link <%= currentPath.startsWith('/payments') ? 'active' : '' %>">
+        <i class="bi bi-credit-card"></i>
+        <span>Billing & Payments</span>
+      </a>
+      <% } %>
+
+        <a href="/housekeeping" class="sidebar-link <%= currentPath.startsWith('/housekeeping') ? 'active' : '' %>">
+          <i class="bi bi-brush"></i>
+          <span>Housekeeping</span>
+        </a>
+
+        <!-- Administration -->
+        <% if (currentUser && currentUser.role==='Admin' ) { %>
+          <div class="nav-section-title">Administration</div>
+          <a href="/staff" class="sidebar-link <%= currentPath.startsWith('/staff') ? 'active' : '' %>">
+            <i class="bi bi-person-badge"></i>
+            <span>Staff Management</span>
+          </a>
+
+          <a href="/reports" class="sidebar-link <%= currentPath.startsWith('/reports') ? 'active' : '' %>">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Reports & Analytics</span>
+          </a>
+          <% } else if (currentUser && currentUser.role==='Receptionist' ) { %>
+            <div class="nav-section-title">Reports</div>
+            <a href="/reports" class="sidebar-link <%= currentPath.startsWith('/reports') ? 'active' : '' %>">
+              <i class="bi bi-file-earmark-bar-graph"></i>
+              <span>Daily Reports</span>
+            </a>
+            <% } %>
+
+              <div class="nav-section-title">Account</div>
+              <a href="/auth/profile" class="sidebar-link <%= currentPath === '/auth/profile' ? 'active' : '' %>">
+                <i class="bi bi-person-gear"></i>
+                <span>My Profile</span>
+              </a>
+  </div>
+
+  <!-- Sidebar Footer / User Snippet -->
+  <% if (currentUser) { %>
+    <div class="sidebar-footer">
+      <div class="user-snippet">
+        <img src="<%= currentUser.avatar || '/images/default-avatar.png' %>" alt="<%= currentUser.name %>"
+          onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(currentUser.name) %>&background=0f172a&color=c5a059'">
+        <div class="user-snippet-info">
+          <span class="user-snippet-name">
+            <%= currentUser.name %>
+          </span>
+          <span class="user-snippet-role">
+            <%= currentUser.role %>
+          </span>
+        </div>
+      </div>
+    </div>
+    <% } %>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

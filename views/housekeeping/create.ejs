@@ -1,0 +1,84 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">Schedule Housekeeping Task</h1>
+    <p class="text-muted small mb-0">Create cleaning, repair, or inspection work orders for hotel rooms.</p>
+  </div>
+  <a href="/housekeeping" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i> Back to Tasks
+  </a>
+</div>
+
+<div class="luxury-card p-4 mx-auto" style="max-width: 700px;">
+  <form action="/housekeeping" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <div class="row g-3">
+      <!-- Room -->
+      <div class="col-12 col-md-6">
+        <label for="room" class="form-label">Target Room <span class="text-danger">*</span></label>
+        <select class="form-select" id="room" name="room" required>
+          <option value="" disabled <%= !selectedRoomId ? 'selected' : '' %>>Choose room...</option>
+          <% rooms.forEach(r => { %>
+            <option value="<%= r._id %>" <%= selectedRoomId && selectedRoomId === r._id.toString() ? 'selected' : '' %>>
+              Room <%= r.roomNumber %> (<%= r.status %>)
+            </option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Staff Assignment -->
+      <div class="col-12 col-md-6">
+        <label for="assignedTo" class="form-label">Assign To</label>
+        <select class="form-select" id="assignedTo" name="assignedTo">
+          <option value="">Unassigned (Open Task)</option>
+          <% staffMembers.forEach(s => { %>
+            <option value="<%= s._id %>"><%= s.name %> (<%= s.role %>)</option>
+          <% }); %>
+        </select>
+      </div>
+
+      <!-- Task Type -->
+      <div class="col-12 col-md-6">
+        <label for="taskType" class="form-label">Task Type <span class="text-danger">*</span></label>
+        <select class="form-select" id="taskType" name="taskType" required>
+          <option value="Daily Cleaning" selected>Daily Cleaning</option>
+          <option value="Deep Clean">Deep Clean</option>
+          <option value="Checkout Clean">Checkout Clean</option>
+          <option value="Maintenance Repair">Maintenance Repair</option>
+          <option value="Inspection">Inspection</option>
+        </select>
+      </div>
+
+      <!-- Priority -->
+      <div class="col-12 col-md-6">
+        <label for="priority" class="form-label">Priority Level <span class="text-danger">*</span></label>
+        <select class="form-select" id="priority" name="priority" required>
+          <option value="Low">Low</option>
+          <option value="Medium" selected>Medium</option>
+          <option value="High">High</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+
+      <!-- Scheduled Date -->
+      <div class="col-12">
+        <label for="scheduledDate" class="form-label">Scheduled Date</label>
+        <input type="date" class="form-control" id="scheduledDate" name="scheduledDate" value="<%= new Date().toISOString().slice(0, 10) %>">
+      </div>
+
+      <!-- Remarks -->
+      <div class="col-12">
+        <label for="remarks" class="form-label">Instructions / Remarks</label>
+        <textarea class="form-control" id="remarks" name="remarks" rows="3" placeholder="Provide special instructions (e.g. linen replacement, bathroom plumbing check, minibar restock)..."></textarea>
+      </div>
+
+      <div class="col-12 d-flex justify-content-end gap-2 pt-3 border-top">
+        <a href="/housekeeping" class="btn btn-outline-secondary">Cancel</a>
+        <button type="submit" class="btn btn-gold">
+          <i class="bi bi-calendar-check me-1"></i> Assign Task
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+

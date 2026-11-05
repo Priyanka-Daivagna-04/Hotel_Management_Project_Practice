@@ -1,0 +1,117 @@
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 fw-bold mb-1 text-dark">My Account Profile</h1>
+    <p class="text-muted small mb-0">Manage your profile credentials, photo, contact info, and login security.</p>
+  </div>
+</div>
+
+<div class="row g-4 mx-auto" style="max-width: 900px;">
+  <!-- Profile Overview Card -->
+  <div class="col-12 col-md-4">
+    <div class="luxury-card p-4 text-center">
+      <div class="position-relative d-inline-block mb-3">
+        <img id="avatarPreview" src="<%= currentUser.avatar || '/images/default-avatar.png' %>" class="rounded-circle shadow-sm" width="120" height="120" style="object-fit: cover; border: 3px solid var(--hotel-gold);" alt="<%= currentUser.name %>" onerror="this.src='https://ui-avatars.com/api/?name=<%= encodeURIComponent(currentUser.name) %>&background=0f172a&color=c5a059&size=120'">
+        <label for="avatarFileInput" class="btn btn-sm btn-gold rounded-circle position-absolute bottom-0 end-0 p-2 shadow" style="width: 36px; height: 36px; cursor: pointer;" title="Change Profile Photo">
+          <i class="bi bi-camera-fill"></i>
+        </label>
+      </div>
+      <h5 class="fw-bold text-dark mb-1"><%= currentUser.name %></h5>
+      <p class="text-muted small mb-2"><%= currentUser.email %></p>
+      <span class="badge bg-navy text-white text-uppercase" style="font-size: 0.75rem;"><%= currentUser.role %></span>
+
+      <div class="text-start border-top pt-3 mt-3 small">
+        <div class="mb-2">
+          <span class="text-muted d-block">Phone:</span>
+          <strong class="text-dark"><%= currentUser.phone || 'Not configured' %></strong>
+        </div>
+        <div>
+          <span class="text-muted d-block">Session Status:</span>
+          <strong class="text-success"><i class="bi bi-shield-check"></i> Authenticated</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forms Section -->
+  <div class="col-12 col-md-8">
+    <!-- Update Details & Profile Photo Form -->
+    <div class="luxury-card p-4 mb-4">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-gear text-warning me-2"></i>Personal Details & Profile Photo</h5>
+      <form action="/auth/profile?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <!-- File Upload for Profile Photo -->
+        <div class="mb-3">
+          <label for="avatarFileInput" class="form-label">Upload New Profile Photo</label>
+          <input type="file" class="form-control" id="avatarFileInput" name="avatar" accept="image/*" onchange="previewImage(this)">
+          <div class="form-text">Supported formats: JPG, PNG, WEBP, GIF (Max size: 4MB).</div>
+        </div>
+
+        <div class="mb-3">
+          <label for="avatarUrl" class="form-label">Or External Image URL</label>
+          <input type="url" class="form-control" id="avatarUrl" name="avatarUrl" placeholder="https://example.com/my-photo.jpg">
+        </div>
+
+        <div class="mb-3">
+          <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="name" name="name" value="<%= currentUser.name %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control bg-light" id="email" value="<%= currentUser.email %>" readonly>
+          <div class="form-text">System login emails are managed by hotel administration.</div>
+        </div>
+
+        <div class="mb-4">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="phone" name="phone" value="<%= currentUser.phone || '' %>" placeholder="+91 98765 43210">
+        </div>
+
+        <button type="submit" class="btn btn-navy">
+          <i class="bi bi-check2-circle me-1"></i> Save Profile & Photo
+        </button>
+      </form>
+    </div>
+
+    <!-- Change Password Form -->
+    <div class="luxury-card p-4">
+      <h5 class="fw-bold text-dark mb-3"><i class="bi bi-shield-lock text-primary me-2"></i>Change Password</h5>
+      <form action="/auth/change-password?_method=PUT" method="POST">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <div class="mb-3">
+          <label for="currentPassword" class="form-label">Current Password <span class="text-danger">*</span></label>
+          <input type="password" class="form-control" id="currentPassword" name="currentPassword" placeholder="••••••••" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
+          <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="Minimum 6 characters" minlength="6" required>
+        </div>
+
+        <div class="mb-4">
+          <label for="confirmPassword" class="form-label">Confirm New Password <span class="text-danger">*</span></label>
+          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Re-type new password" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn btn-gold">
+          <i class="bi bi-key me-1"></i> Update Password
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('avatarPreview').src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
