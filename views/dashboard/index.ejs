@@ -2,17 +2,18 @@
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
   <div>
     <h1 class="h3 fw-bold mb-1 text-dark">Executive Dashboard</h1>
-    <p class="text-muted small mb-0">Overview of property performance, room occupancy, guest reservations and revenue.</p>
+    <p class="text-muted small mb-0">Overview of property performance, room occupancy, guest reservations and revenue.
+    </p>
   </div>
   <div class="d-flex gap-2">
-    <% if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Receptionist')) { %>
+    <% if (currentUser && (currentUser.role==='Admin' || currentUser.role==='Receptionist' )) { %>
       <a href="/bookings/new" class="btn btn-gold">
         <i class="bi bi-calendar-plus me-1"></i> New Reservation
       </a>
       <a href="/reports" class="btn btn-outline-secondary bg-white">
         <i class="bi bi-file-earmark-bar-graph me-1"></i> View Reports
       </a>
-    <% } %>
+      <% } %>
   </div>
 </div>
 
@@ -23,7 +24,9 @@
     <div class="stat-card">
       <div>
         <div class="stat-label">Total Revenue</div>
-        <div class="stat-value"><%= formatINR(stats.totalRevenue) %></div>
+        <div class="stat-value">
+          <%= formatINR(stats.totalRevenue) %>
+        </div>
         <small class="text-success fw-semibold"><i class="bi bi-arrow-up-right"></i> Settled Collections</small>
       </div>
       <div class="stat-icon gold">
@@ -37,8 +40,12 @@
     <div class="stat-card">
       <div>
         <div class="stat-label">Occupancy Rate</div>
-        <div class="stat-value"><%= stats.occupancyRate %>%</div>
-        <small class="text-muted"><%= stats.occupiedRooms %> of <%= stats.totalRooms %> Rooms Occupied</small>
+        <div class="stat-value">
+          <%= stats.occupancyRate %>%
+        </div>
+        <small class="text-muted">
+          <%= stats.occupiedRooms %> of <%= stats.totalRooms %> Rooms Occupied
+        </small>
       </div>
       <div class="stat-icon blue">
         <i class="bi bi-pie-chart"></i>
@@ -51,8 +58,12 @@
     <div class="stat-card">
       <div>
         <div class="stat-label">Today's Check-ins</div>
-        <div class="stat-value"><%= stats.todayCheckIns %></div>
-        <small class="text-primary"><%= stats.todayCheckOuts %> Check-outs Scheduled</small>
+        <div class="stat-value">
+          <%= stats.todayCheckIns %>
+        </div>
+        <small class="text-primary">
+          <%= stats.todayCheckOuts %> Check-outs Scheduled
+        </small>
       </div>
       <div class="stat-icon green">
         <i class="bi bi-box-arrow-in-right"></i>
@@ -65,7 +76,9 @@
     <div class="stat-card">
       <div>
         <div class="stat-label">Registered Guests</div>
-        <div class="stat-value"><%= stats.totalGuests %></div>
+        <div class="stat-value">
+          <%= stats.totalGuests %>
+        </div>
         <small class="text-muted">Active guest directory</small>
       </div>
       <div class="stat-icon purple">
@@ -82,7 +95,9 @@
       <span class="p-2 rounded-circle bg-success-subtle text-success fs-5"><i class="bi bi-check-circle"></i></span>
       <div>
         <div class="text-muted small fw-semibold">Available</div>
-        <div class="fs-4 fw-bold text-dark"><%= stats.availableRooms %></div>
+        <div class="fs-4 fw-bold text-dark">
+          <%= stats.availableRooms %>
+        </div>
       </div>
     </div>
   </div>
@@ -91,16 +106,21 @@
       <span class="p-2 rounded-circle bg-primary-subtle text-primary fs-5"><i class="bi bi-door-closed"></i></span>
       <div>
         <div class="text-muted small fw-semibold">Occupied</div>
-        <div class="fs-4 fw-bold text-dark"><%= stats.occupiedRooms %></div>
+        <div class="fs-4 fw-bold text-dark">
+          <%= stats.occupiedRooms %>
+        </div>
       </div>
     </div>
   </div>
   <div class="col-6 col-md-3">
     <div class="luxury-card p-3 d-flex align-items-center gap-3">
-      <span class="p-2 rounded-circle bg-warning-subtle text-warning-emphasis fs-5"><i class="bi bi-clock-history"></i></span>
+      <span class="p-2 rounded-circle bg-warning-subtle text-warning-emphasis fs-5"><i
+          class="bi bi-clock-history"></i></span>
       <div>
         <div class="text-muted small fw-semibold">Reserved</div>
-        <div class="fs-4 fw-bold text-dark"><%= stats.reservedRooms %></div>
+        <div class="fs-4 fw-bold text-dark">
+          <%= stats.reservedRooms %>
+        </div>
       </div>
     </div>
   </div>
@@ -109,7 +129,9 @@
       <span class="p-2 rounded-circle bg-danger-subtle text-danger fs-5"><i class="bi bi-tools"></i></span>
       <div>
         <div class="text-muted small fw-semibold">Maintenance</div>
-        <div class="fs-4 fw-bold text-dark"><%= stats.maintenanceRooms %></div>
+        <div class="fs-4 fw-bold text-dark">
+          <%= stats.maintenanceRooms %>
+        </div>
       </div>
     </div>
   </div>
@@ -121,7 +143,8 @@
   <div class="col-12 col-lg-8">
     <div class="luxury-card p-4 h-100">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-bar-chart-line text-warning me-2"></i>Monthly Revenue (<%= new Date().getFullYear() %>)</h5>
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-bar-chart-line text-warning me-2"></i>Monthly Revenue (<%=
+            new Date().getFullYear() %>)</h5>
         <span class="badge bg-light text-dark border">INR (₹)</span>
       </div>
       <div style="height: 300px; position: relative;">
@@ -135,7 +158,9 @@
     <div class="luxury-card p-4 h-100">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-pie-chart text-primary me-2"></i>Room Distribution</h5>
-        <span class="badge bg-light text-dark border"><%= stats.totalRooms %> Total</span>
+        <span class="badge bg-light text-dark border">
+          <%= stats.totalRooms %> Total
+        </span>
       </div>
       <div style="height: 250px; position: relative;">
         <canvas id="occupancyDoughnut"></canvas>
@@ -143,19 +168,27 @@
       <div class="d-flex justify-content-around text-center mt-3 pt-2 border-top">
         <div>
           <small class="text-muted d-block">Available</small>
-          <span class="fw-bold text-success"><%= stats.availableRooms %></span>
+          <span class="fw-bold text-success">
+            <%= stats.availableRooms %>
+          </span>
         </div>
         <div>
           <small class="text-muted d-block">Occupied</small>
-          <span class="fw-bold text-primary"><%= stats.occupiedRooms %></span>
+          <span class="fw-bold text-primary">
+            <%= stats.occupiedRooms %>
+          </span>
         </div>
         <div>
           <small class="text-muted d-block">Reserved</small>
-          <span class="fw-bold text-warning"><%= stats.reservedRooms %></span>
+          <span class="fw-bold text-warning">
+            <%= stats.reservedRooms %>
+          </span>
         </div>
         <div>
           <small class="text-muted d-block">Repair</small>
-          <span class="fw-bold text-danger"><%= stats.maintenanceRooms %></span>
+          <span class="fw-bold text-danger">
+            <%= stats.maintenanceRooms %>
+          </span>
         </div>
       </div>
     </div>
@@ -168,11 +201,12 @@
   <div class="col-12 col-xl-8">
     <div class="luxury-card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-range me-2 text-primary"></i>Recent Reservations</h5>
+        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-range me-2 text-primary"></i>Recent Reservations
+        </h5>
         <a href="/bookings" class="btn btn-sm btn-outline-secondary">View All</a>
       </div>
 
-      <% if (recentBookings && recentBookings.length > 0) { %>
+      <% if (recentBookings && recentBookings.length> 0) { %>
         <div class="table-responsive">
           <table class="table table-luxury align-middle">
             <thead>
@@ -187,7 +221,7 @@
               </tr>
             </thead>
             <tbody>
-              <% recentBookings.forEach(booking => { %>
+              <% recentBookings.forEach(booking=> { %>
                 <tr>
                   <td class="fw-semibold">
                     <a href="/bookings/<%= booking._id %>" class="text-decoration-none text-dark">
@@ -196,11 +230,16 @@
                   </td>
                   <td>
                     <% if (booking.guest) { %>
-                      <div class="fw-semibold text-dark"><%= booking.guest.firstName %> <%= booking.guest.lastName %></div>
-                      <small class="text-muted"><%= booking.guest.phone %></small>
-                    <% } else { %>
-                      <span class="text-muted">N/A</span>
-                    <% } %>
+                      <div class="fw-semibold text-dark">
+                        <%= booking.guest.firstName %>
+                          <%= booking.guest.lastName %>
+                      </div>
+                      <small class="text-muted">
+                        <%= booking.guest.phone %>
+                      </small>
+                      <% } else { %>
+                        <span class="text-muted">N/A</span>
+                        <% } %>
                   </td>
                   <td>
                     <span class="badge bg-light text-dark border">
@@ -208,29 +247,37 @@
                     </span>
                   </td>
                   <td>
-                    <div class="small text-dark"><%= formatDateIN(booking.checkInDate) %></div>
-                    <small class="text-muted"><%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %></small>
+                    <div class="small text-dark">
+                      <%= formatDateIN(booking.checkInDate) %>
+                    </div>
+                    <small class="text-muted">
+                      <%= booking.nights %> night<%= booking.nights> 1 ? 's' : '' %>
+                    </small>
                   </td>
                   <td>
-                    <span class="badge-status <%= booking.status.replace(/\s+/g, '_') %>"><%= booking.status %></span>
+                    <span class="badge-status <%= booking.status.replace(/\s+/g, '_') %>">
+                      <%= booking.status %>
+                    </span>
                   </td>
-                  <td class="fw-bold text-dark"><%= formatINR(booking.totalPrice) %></td>
+                  <td class="fw-bold text-dark">
+                    <%= formatINR(booking.totalPrice) %>
+                  </td>
                   <td class="text-end">
                     <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-light border" title="View Voucher">
                       <i class="bi bi-eye"></i>
                     </a>
                   </td>
                 </tr>
-              <% }); %>
+                <% }); %>
             </tbody>
           </table>
         </div>
-      <% } else { %>
-        <div class="text-center py-5 text-muted">
-          <i class="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
-          <p class="mb-0">No reservations recorded yet.</p>
-        </div>
-      <% } %>
+        <% } else { %>
+          <div class="text-center py-5 text-muted">
+            <i class="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
+            <p class="mb-0">No reservations recorded yet.</p>
+          </div>
+          <% } %>
     </div>
   </div>
 
@@ -238,25 +285,32 @@
   <div class="col-12 col-xl-4">
     <div class="luxury-card p-4 h-100">
       <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-activity text-danger me-2"></i>Audit & Activity Stream</h5>
-      
-      <% if (recentActivities && recentActivities.length > 0) { %>
+
+      <% if (recentActivities && recentActivities.length> 0) { %>
         <div class="list-group list-group-flush">
-          <% recentActivities.forEach(act => { %>
+          <% recentActivities.forEach(act=> { %>
             <div class="list-group-item px-0 py-3 border-bottom">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <span class="badge bg-navy text-white text-uppercase" style="font-size: 0.65rem;"><%= act.module %></span>
-                <small class="text-muted"><%= new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %></small>
+                <span class="badge bg-navy text-white text-uppercase" style="font-size: 0.65rem;">
+                  <%= act.module %>
+                </span>
+                <small class="text-muted">
+                  <%= new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit' , minute: '2-digit' }) %>
+                </small>
               </div>
-              <p class="mb-1 text-dark small fw-medium"><%= act.details %></p>
+              <p class="mb-1 text-dark small fw-medium">
+                <%= act.details %>
+              </p>
               <small class="text-muted d-flex align-items-center gap-1">
-                <i class="bi bi-person-circle"></i> <%= act.userName || 'System' %>
+                <i class="bi bi-person-circle"></i>
+                <%= act.userName || 'System' %>
               </small>
             </div>
-          <% }); %>
+            <% }); %>
         </div>
-      <% } else { %>
-        <p class="text-muted small text-center py-4">No recent activity logged.</p>
-      <% } %>
+        <% } else { %>
+          <p class="text-muted small text-center py-4">No recent activity logged.</p>
+          <% } %>
     </div>
   </div>
 </div>
@@ -273,7 +327,7 @@
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
           datasets: [{
             label: 'Revenue (₹)',
-            data: <%- JSON.stringify(chartData.monthlyRevenue) %>,
+            data: <% - JSON.stringify(chartData.monthlyRevenue) %>,
             backgroundColor: 'rgba(197, 160, 89, 0.75)',
             borderColor: '#c5a059',
             borderWidth: 1.5,
@@ -292,7 +346,7 @@
               beginAtZero: true,
               grid: { color: '#f1f5f9' },
               ticks: {
-                callback: function(value) { return '₹' + Number(value).toLocaleString('en-IN'); }
+                callback: function (value) { return '₹' + Number(value).toLocaleString('en-IN'); }
               }
             },
             x: {
