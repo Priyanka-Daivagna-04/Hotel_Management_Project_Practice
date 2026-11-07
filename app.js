@@ -58,10 +58,12 @@ app.use(
           'data:'
         ],
         imgSrc: ["'self'", 'data:', 'https:', 'http:', 'blob:'],
-        connectSrc: ["'self'"]
+        connectSrc: ["'self'"],
+        upgradeInsecureRequests: null
       }
     },
-    crossOriginEmbedderPolicy: false
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: false
   })
 );
 
