@@ -15,7 +15,7 @@ const configureSession = () => {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: isProd, // set to true in production with HTTPS
+      secure: process.env.SECURE_COOKIE === 'true', // false on HTTP Elastic Beanstalk domain
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
       sameSite: 'lax'
     }

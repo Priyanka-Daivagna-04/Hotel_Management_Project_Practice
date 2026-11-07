@@ -27,6 +27,9 @@ const reportRoutes = require('./routes/reportRoutes');
 
 const app = express();
 
+// Trust reverse proxy (AWS Elastic Beanstalk / nginx)
+app.set('trust proxy', 1);
+
 // Security HTTP headers with Content Security Policy configuration
 app.use(
   helmet({
